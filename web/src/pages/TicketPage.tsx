@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { bookingService, cinemaService, movieService } from '@/services/api'
-import { MOCK_SHOWTIMES, formatVND } from '@/data/mock'
+import { bookingService, cinemaService, movieService, showtimeService } from '@/services/api'
+import { formatVND } from '@/data/mock'
 import { gsap, prefersReducedMotion } from '@/lib/gsap'
 import { IconArrowLeft, IconCheck } from '@/components/svg/Icons'
 import type { Booking } from '@/types'
@@ -24,14 +24,14 @@ export function TicketPage() {
     ;(async () => {
       try {
         const b = await bookingService.byId(bookingId)
-        const st = MOCK_SHOWTIMES.find((s) => s.id === b.showtimeId)
-        const mv = st ? await movieService.byId(st.movieId) : null
-        const cs = st ? await cinemaService.byId(st.cinemaId) : null
+        const st = await showtimeService.byId(b.showtimeId)
+        const mv = await movieService.byId(st.movieId)
+        const cs = await cinemaService.byId(st.cinemaId)
         setBooking(b)
         setMovieTitle(mv?.title ?? '')
         setCinemaName(cs?.name ?? '')
-        setRoomName(st ? `Screen ${b.showtimeId.slice(-1)}` : '')
-        setStartTime(st ? new Date(st.startTime) : null)
+        setRoomName(st.roomId ? `Screen ${b.showtimeId.slice(-1)}` : '')
+        setStartTime(new Date(st.startTime))
       } catch (e) {
         setError((e as Error).message)
       } finally {

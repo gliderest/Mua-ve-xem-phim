@@ -30,6 +30,11 @@ export interface Movie {
   rating: number
   reviewCount: number
   slug: string
+  /** poster ảnh thật (TMDB) — nếu có sẽ hiển thị thay cho SVG art */
+  posterUrl?: string
+  backdropUrl?: string
+  /** mã - id thật từ TMDB khi dữ liệu từ TMDB */
+  tmdbId?: number
 }
 
 export interface Cinema {

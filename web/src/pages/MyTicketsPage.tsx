@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { bookingService } from '@/services/api'
-import { MOCK_SHOWTIMES, formatVND } from '@/data/mock'
+import { bookingService, showtimeService } from '@/services/api'
+import { formatVND } from '@/data/mock'
 import { IconTicket, IconArrowRight } from '@/components/svg/Icons'
-import type { Booking } from '@/types'
+import type { Booking, Showtime } from '@/types'
 
 const STATUS: Record<Booking['status'], string> = {
   PENDING_PAYMENT: 'Đang thanh toán',
@@ -14,16 +14,28 @@ const STATUS: Record<Booking['status'], string> = {
 
 export function MyTicketsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [showtimes, setShowtimes] = useState<Record<string, Showtime | null>>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    bookingService.mine().then(setBookings).finally(() => setLoading(false))
+    ;(async () => {
+      try {
+        const list = await bookingService.mine()
+        setBookings(list)
+        const map: Record<string, Showtime | null> = {}
+        for (const b of list) {
+          try {
+            map[b.showtimeId] = await showtimeService.byId(b.showtimeId)
+          } catch {
+            map[b.showtimeId] = null
+          }
+        }
+        setShowtimes(map)
+      } finally {
+        setLoading(false)
+      }
+    })()
   }, [])
-
-  const movieTitle = (book: Booking) => {
-    const st = MOCK_SHOWTIMES.find((s) => s.id === book.showtimeId)
-    return st?.movieId ?? ''
-  }
 
   return (
     <section className="section section--page">
@@ -46,7 +58,7 @@ export function MyTicketsPage() {
         ) : (
           <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
             {bookings.map((b) => {
-              const st = MOCK_SHOWTIMES.find((s) => s.id === b.showtimeId)
+              const st = showtimes[b.showtimeId]
               const seats = b.seats.map((s) => `${s.rowLabel}${s.seatNumber}`).join(', ')
               const time = st ? new Date(st.startTime) : null
               return (
@@ -58,10 +70,11 @@ export function MyTicketsPage() {
                           {STATUS[b.status]}
                         </span>
                         <span className="badge">{b.bookingCode}</span>
-                        <span className="badge">{movieTitle(b).toUpperCase()}</span>
                       </div>
                       <h3 style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-xl)' }}>
-                        {st ? `Vé ${time?.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${time?.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : 'Vé xem phim'}
+                        {time
+                          ? `Suất ${time.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${time.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`
+                          : 'Vé xem phim'}
                       </h3>
                       <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)' }}>
                         Ghế: {seats} · {formatVND(b.totalPrice)}

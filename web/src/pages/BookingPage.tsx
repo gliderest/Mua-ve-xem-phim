@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { cinemaService, movieService, seatService, bookingService } from '@/services/api'
-import { MOCK_SHOWTIMES, formatVND } from '@/data/mock'
+import { cinemaService, movieService, seatService, bookingService, showtimeService } from '@/services/api'
+import { formatVND } from '@/data/mock'
 import { IconArrowLeft, IconSeat, IconShield, IconArrowRight } from '@/components/svg/Icons'
-import type { Booking, Cinema, Movie, Room, Seat, Showtime } from '@/types'
+import type { Cinema, Movie, Room, Seat, Showtime } from '@/types'
 
 export function BookingPage() {
   const { showtimeId } = useParams<{ showtimeId: string }>()
@@ -23,14 +23,9 @@ export function BookingPage() {
   useEffect(() => {
     if (!showtimeId) return
     let alive = true
-    const st = MOCK_SHOWTIMES.find((s) => s.id === showtimeId)
-    if (!st) {
-      setError('Suất chiếu không tồn tại.')
-      setLoading(false)
-      return
-    }
     ;(async () => {
       try {
+        const st = await showtimeService.byId(showtimeId)
         const [mv, { cinema, room }, seatsData] = await Promise.all([
           movieService.byId(st.movieId),
           cinemaService.room(st.roomId),

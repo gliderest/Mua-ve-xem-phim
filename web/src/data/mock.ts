@@ -214,8 +214,12 @@ const addDays = (days: number): string => {
   return d.toISOString().slice(0, 10)
 }
 
-const at = (date: string, hour: number, minute = 0): string =>
-  new Date(`${date}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`).toISOString()
+const at = (date: string, hour: number, minute = 0): string => {
+  // setHours(24, 7) sẽ tự cuộn sang 00:07 ngày hôm sau — tránh "Invalid time value"
+  const d = new Date(`${date}T00:00:00`)
+  d.setHours(hour, minute, 0, 0)
+  return d.toISOString()
+}
 
 export const MOCK_SHOWTIMES: Showtime[] = [
   { id: 'st1', movieId: 'm1', cinemaId: 'c1', roomId: 'r1', date: addDays(0), startTime: at(addDays(0), 10, 30), endTime: at(addDays(0), 12, 38), priceStandard: 90000, priceVip: 120000 },

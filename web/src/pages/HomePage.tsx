@@ -36,7 +36,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="movies-grid">
-              {nowShowing.map((m) => (
+              {nowShowing.slice(0, 8).map((m) => (
                 <MovieCard key={m.id} movie={m} />
               ))}
             </div>
@@ -57,7 +57,7 @@ export function HomePage() {
             </div>
           </div>
           <div className="movies-grid">
-            {comingSoon.map((m) => (
+            {comingSoon.slice(0, 4).map((m) => (
               <MovieCard key={m.id} movie={m} />
             ))}
           </div>

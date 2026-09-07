@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { movieService, cinemaService } from '@/services/api'
-import { PosterArt } from '@/components/svg/PosterArt'
+import { PosterOrArt } from '@/components/common/MovieCard'
 import { IconArrowLeft, IconClock, IconPlay, IconCalendar } from '@/components/svg/Icons'
 import { formatVND } from '@/data/mock'
 import type { Cinema, Showtime } from '@/types'
@@ -96,7 +96,7 @@ export function MovieDetailPage() {
       <section className="detail-hero">
         <div className="container detail-hero__grid">
           <div className="detail-hero__poster" style={{ position: 'relative' }}>
-            <PosterArt movie={movie} />
+            <PosterOrArt movie={movie} />
             <span className="badge badge--gold" style={{ position: 'absolute', top: 12, left: 12 }}>
               {movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}
             </span>
@@ -116,10 +116,18 @@ export function MovieDetailPage() {
             <p className="detail-info__desc">{movie.description}</p>
 
             <dl className="detail-info__meta">
-              <div className="detail-info__meta-item">
-                <dt>Đạo diễn</dt>
-                <dd>{movie.director}</dd>
-              </div>
+              {movie.director && (
+                <div className="detail-info__meta-item">
+                  <dt>Đạo diễn</dt>
+                  <dd>{movie.director}</dd>
+                </div>
+              )}
+              {movie.cast.length > 0 && (
+                <div className="detail-info__meta-item">
+                  <dt>Diễn viên</dt>
+                  <dd>{movie.cast.join(', ')}</dd>
+                </div>
+              )}
               <div className="detail-info__meta-item">
                 <dt>Thời lượng</dt>
                 <dd>{movie.durationMinutes} phút</dd>
@@ -128,10 +136,12 @@ export function MovieDetailPage() {
                 <dt>Khởi chiếu</dt>
                 <dd>{new Date(movie.releaseDate + 'T00:00:00').toLocaleDateString('vi-VN')}</dd>
               </div>
-              <div className="detail-info__meta-item">
-                <dt>Diễn viên</dt>
-                <dd>{movie.cast.join(', ')}</dd>
-              </div>
+              {movie.rating > 0 && (
+                <div className="detail-info__meta-item">
+                  <dt>Đánh giá TMDB</dt>
+                  <dd>{movie.rating.toFixed(1)} ★ ({movie.reviewCount.toLocaleString('vi-VN')} lượt)</dd>
+                </div>
+              )}
             </dl>
 
             <div className="detail-info__actions">

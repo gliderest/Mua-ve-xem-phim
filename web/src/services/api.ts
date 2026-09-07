@@ -6,15 +6,17 @@ import {
   MOCK_SHOWTIMES,
   MOCK_USERS,
 } from '@/data/mock'
+import { tmdbService } from '@/services/tmdb'
 import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from '@/types'
 
 /* ============================================================
    CINÉRA — Mock API service (prototype)
    Chưa có backend: mỗi hàm trả Promise với delay để mô phỏng
    network + trạng thái loading. Phase 2 sẽ thay bằng fetch().
+   Dữ liệu phim: TMDB (region=VN) được merge với dữ liệu mock.
    ============================================================ */
 
-const delay = (ms = 450) => new Promise((res) => setTimeout(res, ms))
+const delay = (ms = 350) => new Promise((res) => setTimeout(res, ms))
 
 export interface MockError extends Error {
   code?: string
@@ -28,19 +30,95 @@ const fail = (message: string, code = 'REQUEST_FAILED'): never => {
 
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v))
 
+const isTmd = (id: string): boolean => id.startsWith('tmdb-')
+const tmdId = (id: string): number => Number(id.replace('tmdb-', ''))
+
+/** Cache showtimes ảo của phim TMDB (để byId tìm được) */
+const tmdShowtimeCache: Showtime[] = []
+
+/** Sinh showtimes ảo cho phim TMDB để demo booking end-to-end */
+function showtimesForTmd(movieId: string): Showtime[] {
+  const cached = tmdShowtimeCache.filter((s) => s.movieId === movieId)
+  if (cached.length > 0) return clone(cached)
+  const now = new Date()
+  const dates = [0, 1, 2].map((d) => {
+    const x = new Date(now)
+    x.setDate(x.getDate() + d)
+    return x.toISOString().slice(0, 10)
+  })
+  const times = [
+    { h: 10, m: 30, roomId: 'r1', cinemaId: 'c1' },
+    { h: 14, m: 0, roomId: 'r2', cinemaId: 'c1' },
+    { h: 19, m: 30, roomId: 'r3', cinemaId: 'c2' },
+    { h: 20, m: 0, roomId: 'r4', cinemaId: 'c3' },
+  ]
+  const out: Showtime[] = []
+  dates.forEach((d, di) => {
+    const t = times[di % times.length]
+    const start = new Date(`${d}T00:00:00`)
+    start.setHours(t.h, t.m, 0, 0)
+    const end = new Date(start)
+    end.setMinutes(end.getMinutes() + 118)
+    const stId = `st-t-${movieId}-${di}`
+    out.push({
+      id: stId,
+      movieId,
+      cinemaId: t.cinemaId,
+      roomId: t.roomId,
+      date: d,
+      startTime: start.toISOString(),
+      endTime: end.toISOString(),
+      priceStandard: 80000 + di * 5000,
+      priceVip: 110000 + di * 5000,
+    })
+  })
+  tmdShowtimeCache.push(...out)
+  return out
+}
+
+/** Tra cứu showtime bất kể mock hay TMDB (dùng chung cho các trang booking) */
+export const showtimeService = {
+  async byId(id: string): Promise<Showtime> {
+    let st = MOCK_SHOWTIMES.find((s) => s.id === id)
+    if (!st) st = tmdShowtimeCache.find((s) => s.id === id)
+    if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
+    return clone(st!)
+  },
+}
+
 export const movieService = {
   async list(): Promise<Movie[]> {
-    await delay()
-    return clone(MOCK_MOVIES)
+    await delay(200)
+    const mock = clone(MOCK_MOVIES)
+    if (tmdbService.enabled) {
+      try {
+        const now = await tmdbService.nowPlayingVN()
+        const up = await tmdbService.upcomingVN()
+        const seen = new Set(mock.map((m) => m.title.toLowerCase()))
+        const fresh = [...now, ...up].filter((m) => !seen.has(m.title.toLowerCase()))
+        return [...mock, ...fresh]
+      } catch {
+        // fallback: mock data khi TMDB lỗi
+      }
+    }
+    return mock
   },
   async byId(id: string): Promise<Movie> {
-    await delay(300)
+    await delay(250)
+    if (isTmd(id) && tmdbService.enabled) {
+      try {
+        return await tmdbService.movieById(tmdId(id))
+      } catch {
+        // fallthrough → mock
+      }
+    }
     const m = MOCK_MOVIES.find((x) => x.id === id)
     if (!m) fail('Không tìm thấy phim.', 'MOVIE_NOT_FOUND')
     return clone(m!)
   },
   async showtimes(movieId: string): Promise<Showtime[]> {
     await delay()
+    if (isTmd(movieId)) return showtimesForTmd(movieId)
     return clone(MOCK_SHOWTIMES.filter((s) => s.movieId === movieId))
   },
   async comments(movieId: string): Promise<Comment[]> {
@@ -105,8 +183,7 @@ export const seatService = {
 export const bookingService = {
   async create(showtimeId: string, seatIds: string[]): Promise<Booking> {
     await delay(600)
-    const st = MOCK_SHOWTIMES.find((s) => s.id === showtimeId)
-    if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
+    const st = await showtimeService.byId(showtimeId)
     if (seatIds.length === 0) fail('Vui lòng chọn ít nhất một ghế.', 'NO_SEATS_SELECTED')
     const showtime: Showtime = clone(st!)
     const seats = await seatService.seatsFor(showtimeId, showtime.roomId)

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Movie } from '@/types'
 import { PosterArt } from '@/components/svg/PosterArt'
@@ -10,15 +11,32 @@ const STATUS_LABEL: Record<Movie['status'], { label: string; cls: string }> = {
   ENDED: { label: 'Đã chiếu', cls: '' },
 }
 
+/** Poster: ảnh thật (TMDB) nếu có, fallback về SVG vẽ tay khi lỗi/thiếu */
+export function PosterOrArt({ movie }: { movie: Movie }) {
+  const [err, setErr] = useState(false)
+  if (movie.posterUrl && !err) {
+    return (
+      <img
+        src={movie.posterUrl}
+        alt={`Poster phim ${movie.title}`}
+        loading="lazy"
+        onError={() => setErr(true)}
+        className="poster-art"
+      />
+    )
+  }
+  return <PosterArt movie={movie} />
+}
+
 export function MovieCard({ movie }: { movie: Movie }) {
   const st = STATUS_LABEL[movie.status]
   return (
     <article className="movie-card" data-reveal>
       <div className="movie-card__poster">
-        <PosterArt movie={movie} />
+        <PosterOrArt movie={movie} />
         <div className="movie-card__badges">
           <span className={`badge ${st.cls}`}>{st.label}</span>
-          <span className="badge">{movie.rated}</span>
+          <span className="badge">{movie.rated || movie.language || '2D'}</span>
         </div>
         <div className="movie-card__overlay">
           <Link
@@ -35,7 +53,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
           <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
         </h3>
         <div className="movie-card__meta">
-          <span>{movie.genre.join(' · ')}</span>
+          <span>{movie.genre.join(' · ') || 'Phim'}</span>
           <span>
             <IconClock size={14} /> {movie.durationMinutes} phút
           </span>
@@ -54,7 +72,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
             </span>
             <span className="rating__value">{movie.rating > 0 ? movie.rating.toFixed(1) : '—'}</span>
             {movie.reviewCount > 0 && (
-              <span className="rating__count">({movie.reviewCount})</span>
+              <span className="rating__count">({movie.reviewCount.toLocaleString('vi-VN')})</span>
             )}
           </div>
           {movie.status === 'NOW_SHOWING' ? (
@@ -68,8 +86,4 @@ export function MovieCard({ movie }: { movie: Movie }) {
       </div>
     </article>
   )
-}
-
-export function PosterThumb({ movie }: { movie: Movie }) {
-  return <PosterArt movie={movie} />
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { bookingService, movieService, cinemaService } from '@/services/api'
-import { MOCK_SHOWTIMES, formatVND } from '@/data/mock'
+import { bookingService, movieService, cinemaService, showtimeService } from '@/services/api'
+import { formatVND } from '@/data/mock'
 import { useCountdown } from '@/hooks/useCountdown'
 import { IconArrowLeft, IconShield, IconCheck, IconClock, IconAlert } from '@/components/svg/Icons'
 import type { Booking } from '@/types'
@@ -65,9 +65,9 @@ export function PaymentPage() {
     ;(async () => {
       try {
         const b = await bookingService.byId(bookingId)
-        const st = MOCK_SHOWTIMES.find((s) => s.id === b.showtimeId)
-        const mv = st ? await movieService.byId(st.movieId) : null
-        const cs = st ? await cinemaService.byId(st.cinemaId) : null
+        const st = await showtimeService.byId(b.showtimeId)
+        const mv = await movieService.byId(st.movieId)
+        const cs = await cinemaService.byId(st.cinemaId)
         setBooking(b)
         setMovieTitle(mv?.title ?? '')
         setCinemaName(cs?.name ?? '')
