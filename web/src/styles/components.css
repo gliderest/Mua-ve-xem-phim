@@ -111,12 +111,15 @@
   justify-content: center;
   gap: var(--space-5);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity var(--duration-normal) var(--ease-out);
+  transition: opacity var(--duration-normal) var(--ease-out), visibility 0s linear var(--duration-normal);
 }
 .nav__drawer.is-open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition: opacity var(--duration-normal) var(--ease-out);
 }
 .nav__drawer a {
   font-family: var(--font-display);
@@ -206,6 +209,7 @@
   font-size: var(--text-xs);
   flex-wrap: wrap;
   position: relative;
+}
 /* ---------------- Hero ---------------- */
 .hero {
   position: relative;
@@ -1235,5 +1239,4 @@
   padding-block: var(--space-5);
   border-bottom: 1px solid var(--border);
   background: var(--bg-deep);
-}
 }

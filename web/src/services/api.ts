@@ -30,6 +30,19 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v))
 const isTmd = (id: string): boolean => id.startsWith('tmdb-')
 const tmdId = (id: string): number => Number(id.replace('tmdb-', ''))
 
+/** Parse id suất chiếu ảo `st-t-<movieId>-<di>` để mở thẳng URL booking được ngay */
+function parseTmdShowtimeId(id: string): { movieId: string; idx: number } | null {
+  const p = 'st-t-'
+  if (!id.startsWith(p)) return null
+  const rest = id.slice(p.length)
+  const idx = rest.lastIndexOf('-')
+  if (idx <= 0) return null
+  const movieId = rest.slice(0, idx)
+  const di = Number(rest.slice(idx + 1))
+  if (!movieId.startsWith('tmdb-') || Number.isNaN(di)) return null
+  return { movieId, idx: di }
+}
+
 /** Cache suất chiếu của phim TMDB (để byId tìm được khi booking) */
 const tmdShowtimeCache: Showtime[] = []
 
@@ -75,7 +88,15 @@ function showtimesForTmd(movieId: string): Showtime[] {
 /** Tra cứu suất chiếu (data hệ thống CINÉRA) */
 export const showtimeService = {
   async byId(id: string): Promise<Showtime> {
-    const st = tmdShowtimeCache.find((s) => s.id === id)
+    let st = tmdShowtimeCache.find((s) => s.id === id)
+    if (!st) {
+      // Mở thẳng URL booking nhưng cache chưa có → tự sinh từ id
+      const parsed = parseTmdShowtimeId(id)
+      if (parsed) {
+        showtimesForTmd(parsed.movieId)
+        st = tmdShowtimeCache.find((s) => s.id === id)
+      }
+    }
     if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
     return clone(st!)
   },
