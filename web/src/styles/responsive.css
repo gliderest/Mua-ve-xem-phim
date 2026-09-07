@@ -35,7 +35,7 @@
 
   /* Hero slideshow mobile */
   .hero__slide-copy .hero__title { font-size: clamp(2.4rem, 11vw, 3.4rem); }
-  .hero--slide .hero__shell { max-width: 100%; }
+  .hero--slide .hero__shell { max-width: 100%; padding-left: 0; }
   .hero__controls { right: var(--space-3); gap: var(--space-2); }
   .hero__arrow { width: 46px; height: 46px; }
   .hero__dots { right: var(--space-4); bottom: 16px; }
