@@ -1,0 +1,28 @@
+{
+  "name": "cinera-cinema-ticket-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CINÉRA — Cinema ticket booking monorepo (Web + Mobile + Backend)",
+  "workspaces": [
+    "web",
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace web run dev",
+    "build:web": "npm --workspace web run build",
+    "preview:web": "npm --workspace web run preview",
+    "dev:backend": "npm --workspace backend run dev",
+    "build:backend": "npm --workspace backend run build",
+    "start:backend": "npm --workspace backend run start",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}

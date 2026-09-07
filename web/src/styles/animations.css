@@ -1,0 +1,105 @@
+/* ============================================================
+   CINÉRA — Animations / Keyframes
+   ============================================================ */
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-seat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes ticket-draw {
+  from { stroke-dashoffset: var(--draw-length, 900); }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Popup ad (theo kiến trúc #18): opacity + scale */
+@keyframes popup-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Applies */
+.anim-fade-up {
+  animation: fade-up var(--duration-slow) var(--ease-cinema) both;
+}
+.anim-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out) both;
+}
+.anim-scale-in {
+  animation: scale-in var(--duration-slow) var(--ease-cinema) both;
+}
+.anim-popup {
+  animation: popup-enter 0.45s var(--ease-spring) both;
+}
+
+.play--pulse-seat {
+  animation: pulse-seat 0.6s var(--ease-out);
+}

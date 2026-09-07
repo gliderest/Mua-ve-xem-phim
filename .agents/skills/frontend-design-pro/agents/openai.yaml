@@ -1,0 +1,32 @@
+name: frontend-design-pro
+summary: One-command wrapper that applies strict frontend guardrails first, then runs full frontend generation workflow.
+description: >-
+  Discoverability metadata for frontend-design-pro. This is a composition wrapper that
+  enforces strict execution order: design-taste-frontend first (guardrails/compliance),
+  frontend-design-ultimate second (generation/workflow).
+aliases:
+  - frontend-design-pro
+  - frontend design pro
+  - frontend design wrapper
+  - frontend guardrails plus generator
+  - design taste plus frontend ultimate
+keywords:
+  - frontend
+  - ui
+  - ux
+  - wrapper
+  - composed skill
+  - guardrails
+  - generation workflow
+  - anti-slop
+  - react
+  - nextjs
+  - tailwind
+category: frontend
+layer: composition-wrapper
+composes_with:
+  - design-taste-frontend
+  - frontend-design-ultimate
+notes:
+  - Always execute design-taste-frontend before frontend-design-ultimate.
+  - This skill is orchestration-only; source skills remain authoritative.

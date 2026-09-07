@@ -1,0 +1,60 @@
+# ==== Dependencies ====
+node_modules/
+.pnp
+.pnp.js
+
+# ==== Agent skill symlinks (tự sinh bởi skills CLI) ====
+.claude/
+
+# ==== Build output ====
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+
+# ==== Environment / Secrets (KHÔNG BAO GIỜ commit) ====
+.env
+.env.local
+.env.*.local
+.env.production
+!*.example
+!*.env.example
+
+# ==== Logs ====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==== Editor / OS ====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ==== Supabase / Render local dumps ====
+*supabase*dump*
+*.backup.sql
+
+# ==== Docker volumes (do not commit runtime data) ====
+pgdata/
+
+# ==== Expo / React Native ====
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/*.jks
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision
+mobile/.expo-shared/
+
+# ==== Misc ====
+cypress/videos/
+cypress/screenshots/

@@ -1,0 +1,46 @@
+# ============================================================
+# CINÉRA — Docker Compose (local development only)
+#
+# Mục tiêu: chạy localhost trước (PostgreSQL để phát triển backend
+# sau này). Ở production dùng Supabase PostgreSQL — KHÔNG deploy
+# container này lên môi trường production.
+#
+#  docker compose up -d      -> chạy
+#  docker compose down       -> tắt
+# ============================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cinera-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cinera}
+      POSTGRES_USER: ${POSTGRES_USER:-cinera}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cinera_local_dev_2024}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Optional: mount SQL migration vào để chạy khi khởi động đầu tiên
+      # - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cinera} -d ${POSTGRES_DB:-cinera}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:4
+    container_name: cinera-adminer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    # Vào http://localhost:8080 để quản lý DB (hệ thống: PostgreSQL,
+    # server: db, user/password/DB theo .env trên)
+
+volumes:
+  pgdata:

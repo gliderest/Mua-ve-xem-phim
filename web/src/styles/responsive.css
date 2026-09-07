@@ -1,0 +1,81 @@
+/* ============================================================
+   CINÉRA — Responsive
+   Hard requirement (kiến trúc #25):
+     Mobile < 800px | Tablet 800–1199px | Desktop >= 1200px
+   Mobile được thiết kế chủ động, không phải bị "co lại".
+   ============================================================ */
+
+/* ---- Desktop: >= 1200px (mặc định, không cần media query) ---- */
+.movies-grid { grid-template-columns: repeat(4, 1fr); }
+.showtimes-grid { grid-template-columns: repeat(3, 1fr); }
+.stat-grid { grid-template-columns: repeat(3, 1fr); }
+
+/* ---- Tablet: 800px – 1199px ---- */
+@media (min-width: 800px) and (max-width: 1199px) {
+  .movies-grid { grid-template-columns: repeat(3, 1fr); }
+  .showtimes-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  .booking-layout { grid-template-columns: 1fr 320px; }
+  .detail-hero__grid { grid-template-columns: 220px 1fr; gap: var(--space-5); }
+  .nav__links { gap: var(--space-4); }
+  .admin-layout { grid-template-columns: 200px 1fr; }
+}
+
+/* ---- Mobile: < 800px ---- */
+@media (max-width: 799px) {
+  .nav__inner { grid-template-columns: auto 1fr auto; gap: var(--space-3); }
+  .nav__links { display: none; }
+  .nav__burger { display: inline-flex; }
+  .nav__actions .btn--ghost { display: none; }
+
+  .hero { min-height: calc(100svh - var(--nav-height)); }
+  .hero__title { font-size: clamp(2.8rem, 14vw, 4.2rem); }
+  .hero__lede { font-size: var(--text-base); }
+  .hero__meta { flex-wrap: wrap; gap: var(--space-4); }
+
+  .movies-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+  .loading-shimmer-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+  .movie-card__body { padding: var(--space-3); }
+  .movie-card__title { font-size: var(--text-lg); }
+
+  .section-head { align-items: flex-start; flex-direction: column; }
+  .section--page { padding-block: var(--space-5); }
+
+  .detail-hero { padding-block: var(--space-5); }
+  .detail-hero__grid { grid-template-columns: 1fr; gap: var(--space-4); }
+  .detail-hero__poster { max-width: 200px; }
+  .detail-info__actions .btn { flex: 1; }
+
+  .showtimes-grid { grid-template-columns: 1fr; gap: var(--space-3); }
+  .booking-layout { grid-template-columns: 1fr; }
+  .summary-panel { position: static; }
+  .seat-map { transform: scale(0.82); transform-origin: top center; }
+  .seat-legend { gap: var(--space-3); font-size: 0.7rem; }
+
+  .ticket__body { grid-template-columns: 1fr; }
+  .ticket__qr { display: none; }
+
+  .footer__grid { grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  .footer__col:first-child { grid-column: 1 / -1; }
+  .footer__bottom { justify-content: center; text-align: center; }
+
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar { position: static; flex-direction: row; overflow-x: auto; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-card__value { font-size: var(--text-3xl); }
+
+  .payment-card { padding: var(--space-4); }
+  .auth-card { padding: var(--space-5); }
+
+  .comment-form { padding: var(--space-4); }
+}
+
+/* ---- Very small: < 420px thêm tinh chỉnh ---- */
+@media (max-width: 419px) {
+  .movies-grid { grid-template-columns: 1fr; }
+  .loading-shimmer-grid { grid-template-columns: 1fr; }
+  .movie-card { flex-direction: row; }
+  .movie-card__poster { width: 110px; aspect-ratio: 2/3; flex: 0 0 auto; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .summary-total { flex-direction: column; gap: var(--space-1); }
+}
