@@ -33,6 +33,13 @@
   .hero__lede { font-size: var(--text-base); }
   .hero__meta { flex-wrap: wrap; gap: var(--space-4); }
 
+  /* Hero slideshow mobile */
+  .hero__slide-copy .hero__title { font-size: clamp(2.4rem, 11vw, 3.4rem); }
+  .hero--slide .hero__shell { max-width: 100%; }
+  .hero__controls { right: var(--space-3); gap: var(--space-2); }
+  .hero__arrow { width: 46px; height: 46px; }
+  .hero__dots { right: var(--space-4); bottom: 16px; }
+
   .movies-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
   .loading-shimmer-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
   .movie-card__body { padding: var(--space-3); }

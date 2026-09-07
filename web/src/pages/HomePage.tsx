@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { movieService } from '@/services/api'
 import { MovieCard } from '@/components/common/MovieCard'
 import { AdPopup } from '@/components/AdPopup'
-import { FilmStrip } from '@/components/svg/Brand'
-import { IconPlay, IconArrowRight, IconMapPin, IconTicket } from '@/components/svg/Icons'
+import { PosterArt } from '@/components/svg/PosterArt'
+import { IconPlay, IconArrowRight, IconArrowLeft, IconMapPin, IconTicket, IconClock } from '@/components/svg/Icons'
 import { gsap, prefersReducedMotion } from '@/lib/gsap'
 import type { Movie } from '@/types'
 
@@ -24,7 +24,7 @@ export function HomePage() {
 
   return (
     <>
-      <Hero />
+      <Hero movies={nowShowing.slice(0, 8)} />
       <SectionHeader title={<em>Đang chiếu</em>} sub="Phim đang chiếu tại các rạp CINÉRA" to="/movies" />
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
@@ -91,63 +91,131 @@ function SectionHeader({ title, sub, to }: { title: React.ReactNode; sub: string
   )
 }
 
-function Hero() {
+function Hero({ movies }: { movies: Movie[] }) {
   const heroRef = useRef<HTMLElement>(null)
+  const n = movies.length
+  const [idx, setIdx] = useState(0)
 
+  // Autoplay: tự chuyển slide mỗi 6 giây (tắt khi reduced-motion)
+  useEffect(() => {
+    if (n <= 1 || prefersReducedMotion()) return
+    const id = window.setInterval(() => setIdx((i) => (i + 1) % n), 6000)
+    return () => window.clearInterval(id)
+  }, [n])
+
+  const prev = () => setIdx((i) => (i - 1 + n) % n)
+  const next = () => setIdx((i) => (i + 1) % n)
+
+  // Entrance một lần khi mount
   useEffect(() => {
     const el = heroRef.current
     if (!el || prefersReducedMotion()) return
-
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.from('.hero__eyebrow', { opacity: 0, y: 18, duration: 0.5 })
-        .from('.hero__title-line', {
-          yPercent: 110,
-          opacity: 0,
-          duration: 0.9,
-          stagger: 0.12,
-        }, '-=0.3')
-        .from('.hero__lede', { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
-        .from('.hero__actions', { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
-        .from('.hero__meta', { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
-        .from('.hero__filmstrip', { opacity: 0, duration: 0.8 }, '-=0.2')
+      gsap.from('.hero__shell', { opacity: 0, y: 22, duration: 0.8, ease: 'power3.out' })
+      gsap.from('.hero__controls', { opacity: 0, x: 14, duration: 0.6, delay: 0.7 })
     }, el)
     return () => ctx.revert()
   }, [])
 
+  const m = n > 0 ? movies[((idx % n) + n) % n] : null
+
   return (
-    <section className="hero" ref={heroRef}>
+    <section className={`hero hero--slide${n > 1 ? ' has-slides' : ''}`} ref={heroRef}>
+      {n > 0 && (
+        <div className="hero__slides" aria-hidden="true">
+          {movies.map((movie, i) => (
+            <div className={`hero__slide${i === idx ? ' is-active' : ''}`} key={movie.id}>
+              {movie.backdropUrl ? (
+                <img src={movie.backdropUrl} alt="" className="hero__slide-img" loading={i < 2 ? 'eager' : 'lazy'} referrerPolicy="no-referrer" />
+              ) : movie.posterUrl ? (
+                <img src={movie.posterUrl} alt="" className="hero__slide-img" loading="lazy" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="hero__slide-art">
+                  <PosterArt movie={movie} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="container hero__inner">
-        <span className="eyebrow hero__eyebrow">Rạp chiếu phim · Đặt vé · Trải nghiệm</span>
-        <h1 className="hero__title">
-          <span className="hero__title-line"><span>Điện ảnh</span></span>
-          <span className="hero__title-line"><span>không chỉ là</span></span>
-          <span className="hero__title-line"><span>một <em>bộ phim</em>.</span></span>
-        </h1>
-        <p className="hero__lede">
-          CINÉRA mang đến trải nghiệm điện ảnh đẳng cấp: ghế ngồi thoải mái, âm thanh sống động,
-          đặt vé và thanh toán chuyển khoản trong vài phút.
-        </p>
-        <div className="hero__actions">
-          <Link to="/movies" className="btn btn--gold btn--lg">
-            <IconPlay size={20} /> Đặt vé ngay
-          </Link>
-          <Link to="/cinemas" className="btn btn--ghost btn--lg">
-            <IconMapPin size={20} /> Hệ thống rạp
-          </Link>
-        </div>
-        <div className="hero__meta">
-          <div><strong>10+</strong> phim đang chiếu</div>
-          <div><strong>3</strong> rạp trải nghiệm</div>
-          <div><strong>24/7</strong> đặt vé trực tuyến</div>
+        <div className="hero__shell">
+          {m ? (
+            <div key={idx} className="hero__slide-copy anim-fade-up">
+              <span className="eyebrow hero__eyebrow">
+                Rạp chiếu phim · {(m.genre[0] || 'Đang chiếu').toUpperCase()}
+              </span>
+              <h1 className="hero__title">
+                <span className="hero__title-line"><span>{m.title}</span></span>
+              </h1>
+              <p className="hero__lede">
+                {m.description.slice(0, 180)}
+                {m.description.length > 180 ? '…' : ''}
+              </p>
+              <div className="hero__actions">
+                <Link to={`/movies/${m.id}`} className="btn btn--gold btn--lg">
+                  <IconPlay size={20} /> Đặt vé ngay
+                </Link>
+                <Link to={`/movies/${m.id}#showtimes`} className="btn btn--ghost btn--lg">
+                  <IconClock size={20} /> Lịch chiếu
+                </Link>
+              </div>
+              <div className="hero__meta">
+                <div><strong>{m.durationMinutes}</strong> phút</div>
+                <div><strong>{m.rating > 0 ? m.rating.toFixed(1) : '—'}</strong> đánh giá TMDB</div>
+                <div><strong>{m.genre.length}</strong> thể loại</div>
+              </div>
+            </div>
+          ) : (
+            <div className="hero__slide-copy">
+              <span className="eyebrow hero__eyebrow">Rạp chiếu phim · Đặt vé · Trải nghiệm</span>
+              <h1 className="hero__title">
+                <span className="hero__title-line"><span>Điện ảnh</span></span>
+                <span className="hero__title-line"><span>không chỉ là</span></span>
+                <span className="hero__title-line"><span>một <em>bộ phim</em>.</span></span>
+              </h1>
+              <p className="hero__lede">
+                CINÉRA mang đến trải nghiệm điện ảnh đẳng cấp: ghế ngồi thoải mái, âm thanh sống động,
+                đặt vé và thanh toán chuyển khoản trong vài phút.
+              </p>
+              <div className="hero__actions">
+                <Link to="/movies" className="btn btn--gold btn--lg">
+                  <IconPlay size={20} /> Đặt vé ngay
+                </Link>
+                <Link to="/cinemas" className="btn btn--ghost btn--lg">
+                  <IconMapPin size={20} /> Hệ thống rạp
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      <div className="hero__filmstrip">
-        <div className="hero__filmstrip-track">
-          <FilmStrip count={12} />
-          <FilmStrip count={12} />
+
+      {n > 1 && (
+        <div className="hero__controls">
+          <button className="hero__arrow" onClick={prev} aria-label="Phim trước">
+            <IconArrowLeft size={22} />
+          </button>
+          <button className="hero__arrow" onClick={next} aria-label="Phim tiếp theo">
+            <IconArrowRight size={22} />
+          </button>
         </div>
-      </div>
+      )}
+
+      {n > 1 && (
+        <div className="hero__dots" role="tablist" aria-label="Chọn phim đang chiếu">
+          {movies.map((_, i) => (
+            <button
+              key={i}
+              className={`hero__dot${i === idx ? ' is-active' : ''}`}
+              onClick={() => setIdx(i)}
+              aria-label={`Phim ${i + 1}`}
+              aria-current={i === idx || undefined}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
