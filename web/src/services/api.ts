@@ -1,22 +1,19 @@
 import {
   MOCK_CINEMAS,
-  MOCK_COMMENTS,
-  MOCK_MOVIES,
   MOCK_ROOMS,
-  MOCK_SHOWTIMES,
   MOCK_USERS,
 } from '@/data/mock'
 import { tmdbService } from '@/services/tmdb'
 import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from '@/types'
 
 /* ============================================================
-   CINÉRA — Mock API service (prototype)
-   Chưa có backend: mỗi hàm trả Promise với delay để mô phỏng
-   network + trạng thái loading. Phase 2 sẽ thay bằng fetch().
-   Dữ liệu phim: TMDB (region=VN) được merge với dữ liệu mock.
+   CINÉRA — Service layer (prototype)
+   - PHIM: 100% lấy trực tiếp từ TMDB (region=VN). KHÔNG mock.
+   - Rạp/phòng/suất chiếu/ghế/auth: là dữ liệu riêng của hệ thống
+     CINÉRA (TMDB không cung cấp) — chờ backend thật ở Phase 2.
    ============================================================ */
 
-const delay = (ms = 350) => new Promise((res) => setTimeout(res, ms))
+const delay = (ms = 250) => new Promise((res) => setTimeout(res, ms))
 
 export interface MockError extends Error {
   code?: string
@@ -33,10 +30,10 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v))
 const isTmd = (id: string): boolean => id.startsWith('tmdb-')
 const tmdId = (id: string): number => Number(id.replace('tmdb-', ''))
 
-/** Cache showtimes ảo của phim TMDB (để byId tìm được) */
+/** Cache suất chiếu của phim TMDB (để byId tìm được khi booking) */
 const tmdShowtimeCache: Showtime[] = []
 
-/** Sinh showtimes ảo cho phim TMDB để demo booking end-to-end */
+/** Sinh suất chiếu cho phim TMDB — chờ backend thật (Phase 2) để lấy lịch chiếu thực */
 function showtimesForTmd(movieId: string): Showtime[] {
   const cached = tmdShowtimeCache.filter((s) => s.movieId === movieId)
   if (cached.length > 0) return clone(cached)
@@ -59,9 +56,8 @@ function showtimesForTmd(movieId: string): Showtime[] {
     start.setHours(t.h, t.m, 0, 0)
     const end = new Date(start)
     end.setMinutes(end.getMinutes() + 118)
-    const stId = `st-t-${movieId}-${di}`
     out.push({
-      id: stId,
+      id: `st-t-${movieId}-${di}`,
       movieId,
       cinemaId: t.cinemaId,
       roomId: t.roomId,
@@ -76,54 +72,38 @@ function showtimesForTmd(movieId: string): Showtime[] {
   return out
 }
 
-/** Tra cứu showtime bất kể mock hay TMDB (dùng chung cho các trang booking) */
+/** Tra cứu suất chiếu (data hệ thống CINÉRA) */
 export const showtimeService = {
   async byId(id: string): Promise<Showtime> {
-    let st = MOCK_SHOWTIMES.find((s) => s.id === id)
-    if (!st) st = tmdShowtimeCache.find((s) => s.id === id)
+    const st = tmdShowtimeCache.find((s) => s.id === id)
     if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
     return clone(st!)
   },
 }
 
+/* ============================================================
+   MOVIES — 100% TMDB (region=VN), không fallback mock
+   ============================================================ */
 export const movieService = {
   async list(): Promise<Movie[]> {
-    await delay(200)
-    const mock = clone(MOCK_MOVIES)
-    if (tmdbService.enabled) {
-      try {
-        const now = await tmdbService.nowPlayingVN()
-        const up = await tmdbService.upcomingVN()
-        const seen = new Set(mock.map((m) => m.title.toLowerCase()))
-        const fresh = [...now, ...up].filter((m) => !seen.has(m.title.toLowerCase()))
-        return [...mock, ...fresh]
-      } catch {
-        // fallback: mock data khi TMDB lỗi
-      }
-    }
-    return mock
+    await delay(150)
+    if (!tmdbService.enabled) fail('Thiếu TMDB API key (web/.env). Không hiển thị mock.', 'TMDB_DISABLED')
+    const now = await tmdbService.nowPlayingVN()
+    const up = await tmdbService.upcomingVN()
+    return [...now, ...up]
   },
   async byId(id: string): Promise<Movie> {
-    await delay(250)
-    if (isTmd(id) && tmdbService.enabled) {
-      try {
-        return await tmdbService.movieById(tmdId(id))
-      } catch {
-        // fallthrough → mock
-      }
-    }
-    const m = MOCK_MOVIES.find((x) => x.id === id)
-    if (!m) fail('Không tìm thấy phim.', 'MOVIE_NOT_FOUND')
-    return clone(m!)
+    await delay(200)
+    if (!isTmd(id)) fail('Phim không tồn tại trên TMDB.', 'MOVIE_NOT_FOUND')
+    return tmdbService.movieById(tmdId(id))
   },
   async showtimes(movieId: string): Promise<Showtime[]> {
     await delay()
-    if (isTmd(movieId)) return showtimesForTmd(movieId)
-    return clone(MOCK_SHOWTIMES.filter((s) => s.movieId === movieId))
+    return showtimesForTmd(movieId)
   },
   async comments(movieId: string): Promise<Comment[]> {
-    await delay(300)
-    return clone(MOCK_COMMENTS[movieId] ?? [])
+    if (!isTmd(movieId)) return []
+    return tmdbService.reviews(tmdId(movieId))
   },
 }
 
@@ -149,11 +129,10 @@ export const cinemaService = {
 
 export const seatService = {
   async seatsFor(showtimeId: string, roomId: string): Promise<Seat[]> {
-    await delay(500)
-    const showtime = MOCK_SHOWTIMES.find((s) => s.id === showtimeId)
-    if (!showtime) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
+    await delay(400)
+    await showtimeService.byId(showtimeId)
 
-    // Sơ đồ ghế deterministic từ showtimeId
+    // Sơ đồ ghế deterministic từ showtimeId (data hệ thống CINÉRA)
     const rows = 9
     const cols = 13
     const rowLabels = 'ABCDEFGHI'.slice(0, rows)

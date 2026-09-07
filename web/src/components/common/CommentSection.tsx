@@ -1,22 +1,18 @@
 import { useEffect, useState } from 'react'
 import { movieService } from '@/services/api'
 import { RatingStars } from '@/components/common/RatingStars'
-import { IconCheck, IconAlert } from '@/components/svg/Icons'
-import type { Comment } from '@/types'
+import { IconCheck } from '@/components/svg/Icons'
 
-/** Mục #17 kiến trúc: form bình luận + rating công khai. */
+/** Bình luận lấy trực tiếp từ TMDB reviews. Form gửi sẽ bật khi có backend (Phase 2). */
 export function CommentSection({ movieId }: { movieId: string }) {
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<Awaited<ReturnType<typeof movieService.comments>>>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [content, setContent] = useState('')
-  const [rating, setRating] = useState(5)
-  const [submitting, setSubmitting] = useState(false)
-  const [submitMsg, setSubmitMsg] = useState<string | null>(null)
-  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -29,50 +25,16 @@ export function CommentSection({ movieId }: { movieId: string }) {
 
   useEffect(load, [movieId])
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitting(true)
-    setSubmitError(null)
-    setSubmitMsg(null)
-
-    // Server-side validation sẽ làm ở Phase 2 (Zod). Demo: validate cơ bản.
-    if (name.trim().length < 2) {
-      setSubmitError('Vui lòng nhập tên của bạn.')
-      setSubmitting(false)
+    if (name.trim().length < 2 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim()) || content.trim().length < 4) {
       return
     }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
-      setSubmitError('Email không hợp lệ.')
-      setSubmitting(false)
-      return
-    }
-    if (content.trim().length < 4) {
-      setSubmitError('Nội dung bình luận quá ngắn.')
-      setSubmitting(false)
-      return
-    }
-
-    try {
-      await new Promise((res) => setTimeout(res, 700))
-      const newComment: Comment = {
-        id: `cm${Date.now()}`,
-        movieId,
-        name: name.trim(),
-        email: email.trim(),
-        content: content.trim(),
-        rating,
-        createdAt: new Date().toISOString(),
-      }
-      setComments((prev) => [newComment, ...prev])
-      setSubmitMsg('Bình luận của bạn đã được đăng tải. Cảm ơn bạn!')
-      setName('')
-      setEmail('')
-      setContent('')
-    } catch {
-      setSubmitError('Không thể gửi bình luận. Vui lòng thử lại.')
-    } finally {
-      setSubmitting(false)
-    }
+    // Chưa có backend để lưu bình luận (Phase 2) — ghi nhận mong muốn gửi.
+    setSubmitted(true)
+    setName('')
+    setEmail('')
+    setContent('')
   }
 
   return (
@@ -114,14 +76,9 @@ export function CommentSection({ movieId }: { movieId: string }) {
 
           <form className="card comment-form" onSubmit={submit}>
             <h3 style={{ marginBottom: 'var(--space-4)' }}>Để lại nhận xét</h3>
-            {submitError && (
-              <div className="alert alert--error" style={{ marginBottom: 'var(--space-4)' }}>
-                <IconAlert size={20} /> {submitError}
-              </div>
-            )}
-            {submitMsg && (
+            {submitted && (
               <div className="alert alert--success" style={{ marginBottom: 'var(--space-4)' }}>
-                <IconCheck size={20} /> {submitMsg}
+                <IconCheck size={20} /> Đã nhận ghi nhận của bạn. Bình luận &amp; đánh giá hệ thống CINÉRA sẽ được lưu khi backend hoàn thiện (Phase 2).
               </div>
             )}
             <div className="field">
@@ -133,15 +90,11 @@ export function CommentSection({ movieId }: { movieId: string }) {
               <input id="c-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ban@email.com" required />
             </div>
             <div className="field">
-              <label>Đánh giá *</label>
-              <RatingStars value={rating} onSelect={setRating} interactive />
-            </div>
-            <div className="field">
               <label htmlFor="c-content">Nội dung *</label>
               <textarea id="c-content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Cảm nhận của bạn về bộ phim..." required />
             </div>
-            <button type="submit" className="btn btn--gold btn--block" disabled={submitting}>
-              {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
+            <button type="submit" className="btn btn--gold btn--block">
+              Gửi bình luận
             </button>
           </form>
         </div>

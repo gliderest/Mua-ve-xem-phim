@@ -137,7 +137,7 @@ export const LAYOUTS: Array<(h: number) => JSX.Element> = [
         })}
         <circle cx="250" cy="110" r="5" fill={c} />
         <path d="M140 560 L210 470 L280 560 Z" fill={`hsl(${h} 40% 16%)`} />
-        <text x="250" y="560" textAnchor="middle" fill="#f3eee4" fontSize="30" fontFamily="Cormorant Garamond, serif" fontStyle="italic">Giao Thừa</text>
+        <text x="250" y="560" textAnchor="middle" fill="#f3eee4" fontSize="30" fontFamily="Cormorant Garamond, serif" fontStyle="italic">CINÉRA</text>
       </>
     )
   },

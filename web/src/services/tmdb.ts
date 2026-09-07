@@ -1,4 +1,4 @@
-import type { Movie } from '@/types'
+import type { Comment, Movie } from '@/types'
 
 /* ============================================================
    TMDB service — phim đang chiếu tại Việt Nam (region=VN)
@@ -91,6 +91,21 @@ async function mapMovie(t: TMovie): Promise<Movie> {
   }
 }
 
+interface TReview {
+  id: string
+  author: string
+  content: string
+  created_at: string
+  author_details?: {
+    username?: string
+    rating?: number
+  }
+}
+
+interface TReviewsResponse {
+  results: TReview[]
+}
+
 export const tmdbService = {
   enabled: hasKey(),
 
@@ -118,6 +133,21 @@ export const tmdbService = {
   async movieById(tmdbId: number): Promise<Movie> {
     const data = await fetchJson<TMovie>(`/movie/${tmdbId}?language=vi-VN`)
     return mapMovie(data)
+  },
+
+  /** Đánh giá/comment của cộng đồng TMDB cho phim */
+  async reviews(tmdbId: number, limit = 6): Promise<Comment[]> {
+    const data = await fetchJson<TReviewsResponse>(`/movie/${tmdbId}/reviews`)
+    const list = data.results ?? []
+    return list.slice(0, limit).map((r) => ({
+      id: r.id,
+      movieId: `tmdb-${tmdbId}`,
+      name: r.author_details?.username || r.author || 'Khán giả TMDB',
+      email: '',
+      content: r.content.trim(),
+      rating: r.author_details?.rating ? Math.round(r.author_details.rating) : 0,
+      createdAt: r.created_at,
+    }))
   },
 
   /** Ảnh poster TMDB */

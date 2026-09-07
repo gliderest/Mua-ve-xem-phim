@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { movieService } from '@/services/api'
-import { MOCK_COMMENTS, MOCK_CONTACT_MESSAGES, formatVND } from '@/data/mock'
+import { MOCK_CONTACT_MESSAGES } from '@/data/mock'
 import { IconEdit, IconTrash, IconChat, IconUser, IconTicket, IconEye } from '@/components/svg/Icons'
 import type { AdminStats, Comment, ContactMessage, Movie } from '@/types'
 
@@ -184,21 +184,41 @@ function AdminMovies() {
   )
 }
 function AdminComments() {
-  const [comments, setComments] = useState<Comment[]>(() =>
-    Object.values(MOCK_COMMENTS).flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-  )
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loading, setLoading] = useState(true)
   const [notice, setNotice] = useState<string | null>(null)
+
+  // Gom review/comment TRỰC TIẾP từ TMDB của các phim đang chiếu
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const movies = await movieService.list()
+        const all: Comment[] = []
+        for (const m of movies.slice(0, 4)) {
+          try {
+            const cs = await movieService.comments(m.id)
+            all.push(...cs)
+          } catch {
+            // phim không có review thì bỏ qua
+          }
+        }
+        setComments(all.sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [])
 
   const remove = (id: string) => {
     setComments((prev) => prev.filter((c) => c.id !== id))
-    setNotice('Đã xóa bình luận (mock).')
+    setNotice('Đã xóa khỏi danh sách hiển thị. (Backend Phase 2 sẽ xóa vĩnh viễn.)')
     setTimeout(() => setNotice(null), 3000)
   }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-        <h2>Quản lý bình luận</h2>
+        <h2>Bình luận &amp; đánh giá (TMDB)</h2>
         <span className="badge">{comments.length} bình luận</span>
       </div>
       {notice && <div className="alert alert--info" style={{ marginBottom: 'var(--space-4)' }}>{notice}</div>}
@@ -215,22 +235,40 @@ function AdminComments() {
             </tr>
           </thead>
           <tbody>
-            {comments.map((c) => (
-              <tr key={c.id}>
-                <td>
-                  <strong>{c.name}</strong>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>{c.email}</div>
-                </td>
-                <td>{c.content}</td>
-                <td>{'★'.repeat(c.rating)}</td>
-                <td>{new Date(c.createdAt).toLocaleDateString('vi-VN')}</td>
-                <td>
-                  <button className="icon-btn icon-btn--del" aria-label={`Xóa bình luận của ${c.name}`} onClick={() => remove(c.id)}>
-                    <IconTrash size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td><div className="skeleton" style={{ height: 20 }} /></td>
+                    <td><div className="skeleton" style={{ height: 20 }} /></td>
+                    <td><div className="skeleton" style={{ height: 20 }} /></td>
+                    <td><div className="skeleton" style={{ height: 20 }} /></td>
+                    <td />
+                  </tr>
+                ))
+              : comments.length === 0
+                ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <div className="state-empty">Chưa có đánh giá công khai nào từ TMDB.</div>
+                      </td>
+                    </tr>
+                  )
+                : comments.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <strong>{c.name}</strong>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>{c.email || 'TMDB'}</div>
+                      </td>
+                      <td>{c.content.slice(0, 120)}{c.content.length > 120 ? '…' : ''}</td>
+                      <td>{c.rating > 0 ? '★'.repeat(Math.min(c.rating, 5)) : '—'}</td>
+                      <td>{new Date(c.createdAt).toLocaleDateString('vi-VN')}</td>
+                      <td>
+                        <button className="icon-btn icon-btn--del" aria-label={`Xóa bình luận của ${c.name}`} onClick={() => remove(c.id)}>
+                          <IconTrash size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
           </tbody>
         </table>
       </div>
