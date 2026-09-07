@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Movie } from '@/types'
 import { PosterArt } from '@/components/svg/PosterArt'
@@ -11,16 +11,27 @@ const STATUS_LABEL: Record<Movie['status'], { label: string; cls: string }> = {
   ENDED: { label: 'Đã chiếu', cls: '' },
 }
 
-/** Poster: ảnh thật (TMDB) nếu có, fallback về SVG vẽ tay khi lỗi/thiếu */
+/** Poster: ảnh thật (TMDB) nếu có — tự fallback về SVG vẽ tay khi lỗi/treo */
 export function PosterOrArt({ movie }: { movie: Movie }) {
   const [err, setErr] = useState(false)
-  if (movie.posterUrl && !err) {
+  const [slow, setSlow] = useState(false)
+
+  // Nếu ảnh không tải xong sau 4.5s (CDN chậm/chặn) → dùng SVG art
+  useEffect(() => {
+    if (!movie.posterUrl || err) return
+    const id = window.setTimeout(() => setSlow(true), 4500)
+    return () => window.clearTimeout(id)
+  }, [movie.posterUrl, err])
+
+  if (movie.posterUrl && !err && !slow) {
     return (
       <img
         src={movie.posterUrl}
         alt={`Poster phim ${movie.title}`}
         loading="lazy"
+        referrerPolicy="no-referrer"
         onError={() => setErr(true)}
+        onLoad={() => setSlow(false)}
         className="poster-art"
       />
     )
