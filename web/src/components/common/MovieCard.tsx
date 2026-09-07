@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Movie } from '@/types'
 import { PosterArt } from '@/components/svg/PosterArt'
@@ -11,17 +11,34 @@ const STATUS_LABEL: Record<Movie['status'], { label: string; cls: string }> = {
   ENDED: { label: 'Đã chiếu', cls: '' },
 }
 
-/** Poster: ảnh thật (TMDB) nếu có — tự fallback về SVG vẽ tay khi lỗi/treo */
+/**
+ * Poster: ảnh thật TMDB. Chỉ fallback về SVG vẽ tay khi ẢNH THẬT SỰ LỖI (onError)
+ * hoặc treo quá lâu chưa tải (6s). Khi ảnh đã load xong → GIỮ ẢNH vĩnh viễn,
+ * timer fallback bị hủy (đây là bug trước: ảnh hiện rồi 5s sau biến mất).
+ */
 export function PosterOrArt({ movie }: { movie: Movie }) {
   const [err, setErr] = useState(false)
   const [slow, setSlow] = useState(false)
+  const loadedRef = useRef(false)
+  const timerRef = useRef<number | undefined>(undefined)
 
-  // Nếu ảnh không tải xong sau 4.5s (CDN chậm/chặn) → dùng SVG art
   useEffect(() => {
-    if (!movie.posterUrl || err) return
-    const id = window.setTimeout(() => setSlow(true), 4500)
-    return () => window.clearTimeout(id)
+    if (!movie.posterUrl || err || loadedRef.current) return
+    timerRef.current = window.setTimeout(() => setSlow(true), 6000)
+    return () => window.clearTimeout(timerRef.current)
   }, [movie.posterUrl, err])
+
+  const handleLoad = () => {
+    loadedRef.current = true
+    window.clearTimeout(timerRef.current)
+    setSlow(false)
+    setErr(false)
+  }
+
+  const handleError = () => {
+    window.clearTimeout(timerRef.current)
+    setErr(true)
+  }
 
   if (movie.posterUrl && !err && !slow) {
     return (
@@ -30,8 +47,8 @@ export function PosterOrArt({ movie }: { movie: Movie }) {
         alt={`Poster phim ${movie.title}`}
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={() => setErr(true)}
-        onLoad={() => setSlow(false)}
+        onError={handleError}
+        onLoad={handleLoad}
         className="poster-art"
       />
     )
