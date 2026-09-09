@@ -16,7 +16,23 @@ import { adminRouter } from './routes/admin.js'
 
 export const app = express()
 
-app.use(helmet())
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", 'https://api.themoviedb.org'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https://image.tmdb.org'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        scriptSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  }),
+)
 app.use(
   cors({
     origin: [env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:4173'].filter(Boolean),
