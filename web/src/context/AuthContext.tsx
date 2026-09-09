@@ -1,11 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { authService } from '@/services/api'
 import type { User } from '@/types'
-
 interface AuthState {
   user: User | null
   loading: boolean
-  login: (username: string, password: string) => Promise<User>
+  login: (email: string, password: string) => Promise<User>
   register: (username: string, email: string, password: string) => Promise<User>
   logout: () => void
   isAdmin: boolean
@@ -28,8 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const login = async (username: string, password: string) => {
-    const u = await authService.login(username, password)
+  const login = async (email: string, password: string) => {
+    const u = await authService.login(email, password)
     setUser(u)
     return u
   }

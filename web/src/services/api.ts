@@ -1,19 +1,12 @@
-import {
-  MOCK_CINEMAS,
-  MOCK_ROOMS,
-  MOCK_USERS,
-} from '@/data/mock'
-import { tmdbService } from '@/services/tmdb'
 import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from '@/types'
 
 /* ============================================================
-   CINEGA — Service layer (prototype)
-   - PHIM: 100% lấy trực tiếp từ TMDB (region=VN). KHÔNG mock.
-   - Rạp/phòng/suất chiếu/ghế/auth: là dữ liệu riêng của hệ thống
-     CINEGA (TMDB không cung cấp) — chờ backend thật ở Phase 2.
+   CINEGA — Service layer (REAL API → Express → Supabase)
+   Mọi hàm gọi backend thật qua VITE_API_URL.
+   Interface giữ nguyên để các trang không phải đổi.
    ============================================================ */
 
-const delay = (ms = 250) => new Promise((res) => setTimeout(res, ms))
+const API = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api'
 
 export interface MockError extends Error {
   code?: string
@@ -25,325 +18,338 @@ const fail = (message: string, code = 'REQUEST_FAILED'): never => {
   throw err
 }
 
-const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v))
+/* ---------- Fetch helper: đính kèm JWT, parse { data } | { error } ---------- */
+let accessToken: string | null = null
 
-const isTmd = (id: string): boolean => id.startsWith('tmdb-')
-const tmdId = (id: string): number => Number(id.replace('tmdb-', ''))
-
-/** Parse id suất chiếu ảo `st-t-<movieId>-<di>` để mở thẳng URL booking được ngay */
-function parseTmdShowtimeId(id: string): { movieId: string; idx: number } | null {
-  const p = 'st-t-'
-  if (!id.startsWith(p)) return null
-  const rest = id.slice(p.length)
-  const idx = rest.lastIndexOf('-')
-  if (idx <= 0) return null
-  const movieId = rest.slice(0, idx)
-  const di = Number(rest.slice(idx + 1))
-  if (!movieId.startsWith('tmdb-') || Number.isNaN(di)) return null
-  return { movieId, idx: di }
+export function setToken(token: string | null) {
+  accessToken = token
+  if (token) localStorage.setItem('cinega_token', token)
+  else localStorage.removeItem('cinega_token')
+}
+export function getToken() {
+  return accessToken
 }
 
-/** Cache suất chiếu của phim TMDB (để byId tìm được khi booking) */
-const tmdShowtimeCache: Showtime[] = []
-
-/** Sinh suất chiếu cho phim TMDB — chờ backend thật (Phase 2) để lấy lịch chiếu thực */
-function showtimesForTmd(movieId: string): Showtime[] {
-  const cached = tmdShowtimeCache.filter((s) => s.movieId === movieId)
-  if (cached.length > 0) return clone(cached)
-  const now = new Date()
-  const dates = [0, 1, 2].map((d) => {
-    const x = new Date(now)
-    x.setDate(x.getDate() + d)
-    return x.toISOString().slice(0, 10)
-  })
-  const times = [
-    { h: 10, m: 30, roomId: 'r1', cinemaId: 'c1' },
-    { h: 14, m: 0, roomId: 'r2', cinemaId: 'c1' },
-    { h: 19, m: 30, roomId: 'r3', cinemaId: 'c2' },
-    { h: 20, m: 0, roomId: 'r4', cinemaId: 'c3' },
-  ]
-  const out: Showtime[] = []
-  dates.forEach((d, di) => {
-    const t = times[di % times.length]
-    const start = new Date(`${d}T00:00:00`)
-    start.setHours(t.h, t.m, 0, 0)
-    const end = new Date(start)
-    end.setMinutes(end.getMinutes() + 118)
-    out.push({
-      id: `st-t-${movieId}-${di}`,
-      movieId,
-      cinemaId: t.cinemaId,
-      roomId: t.roomId,
-      date: d,
-      startTime: start.toISOString(),
-      endTime: end.toISOString(),
-      priceStandard: 80000 + di * 5000,
-      priceVip: 110000 + di * 5000,
-    })
-  })
-  tmdShowtimeCache.push(...out)
-  return out
-}
-
-/** Storage key cho showtimes admin đã tạo/sửa */
-const STORAGE_KEY = 'cinera_showtimes'
-
-/** Đọc showtimes đã lưu từ localStorage */
-function loadSavedShowtimes(): Showtime[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
+async function http<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> | undefined),
   }
-}
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
 
-/** Ghi showtimes admin vào localStorage */
-function saveShowtimes(list: Showtime[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-}
+  const res = await fetch(`${API}${path}`, { ...options, headers })
+  let body: any = null
+  try { body = await res.json() } catch { /* no body */ }
 
-/** Merge: deterministic default + admin-created (admin override default cùng movieId+date+time) */
-function mergedShowtimes(movieId: string): Showtime[] {
-  const defaults = showtimesForTmd(movieId)
-  const saved = loadSavedShowtimes().filter((s) => s.movieId === movieId)
-  if (saved.length === 0) return defaults
-
-  // Admin-saved thay thế default nếu cùng date+time+roomId
-  const key = (s: Showtime) => `${s.date}-${s.startTime}-${s.roomId}`
-  const savedKeys = new Set(saved.map(key))
-  const filteredDefaults = defaults.filter((d) => !savedKeys.has(key(d)))
-  return [...filteredDefaults, ...saved]
-}
-
-/** Tra cứu suất chiếu (data hệ thống CINEGA) */
-export const showtimeService = {
-  async byId(id: string): Promise<Showtime> {
-    // Tìm trong cache + saved
-    let st = tmdShowtimeCache.find((s) => s.id === id)
-    if (!st) {
-      const saved = loadSavedShowtimes().find((s) => s.id === id)
-      if (saved) { st = saved }
-    }
-    if (!st) {
-      const parsed = parseTmdShowtimeId(id)
-      if (parsed) {
-        showtimesForTmd(parsed.movieId)
-        st = tmdShowtimeCache.find((s) => s.id === id)
-      }
-    }
-    if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
-    return clone(st!)
-  },
-
-  /** Lấy danh sách suất chiếu cho 1 phim (merged default + admin) */
-  async byMovie(movieId: string): Promise<Showtime[]> {
-    return clone(mergedShowtimes(movieId))
-  },
-
-  /** Thêm suất chiếu mới từ admin */
-  async add(showtime: Omit<Showtime, 'id'>): Promise<Showtime> {
-    const id = `st-a-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-    const newSt: Showtime = { ...showtime, id }
-    const saved = loadSavedShowtimes()
-    saved.push(newSt)
-    saveShowtimes(saved)
-    return clone(newSt)
-  },
-
-  /** Sửa suất chiếu */
-  async update(id: string, patch: Partial<Omit<Showtime, 'id'>>): Promise<Showtime> {
-    const saved = loadSavedShowtimes()
-    const idx = saved.findIndex((s) => s.id === id)
-    if (idx < 0) fail('Suất chiếu không tồn tại để sửa.', 'SHOWTIME_NOT_FOUND')
-    saved[idx] = { ...saved[idx], ...patch }
-    saveShowtimes(saved)
-    return clone(saved[idx])
-  },
-
-  /** Xóa suất chiếu */
-  async delete(id: string): Promise<void> {
-    const saved = loadSavedShowtimes()
-    saveShowtimes(saved.filter((s) => s.id !== id))
-  },
-
-  /** Lấy tất cả showtimes (admin xem tổng quan) */
-  async all(): Promise<Showtime[]> {
-    const allIds = new Set<string>()
-    const out: Showtime[] = []
-    // Lấy saved trước
-    for (const s of loadSavedShowtimes()) { allIds.add(s.id); out.push(s) }
-    // Thêm defaults từ cache
-    for (const s of tmdShowtimeCache) { if (!allIds.has(s.id)) { allIds.add(s.id); out.push(s) } }
-    return clone(out)
-  },
-}
-
-/** Xóa cache khi update (để mergedShowtimes refill) */
-export function clearShowtimeCache() {
-  tmdShowtimeCache.length = 0
+  if (!res.ok) {
+    const msg = body?.error?.message ?? 'Yêu cầu thất bại, vui lòng thử lại.'
+    const code = body?.error?.code ?? 'REQUEST_FAILED'
+    if (res.status === 401) setToken(null)
+    throw Object.assign(new Error(msg), { code })
+  }
+  return (body?.data ?? body) as T
 }
 
 /* ============================================================
-   MOVIES — 100% TMDB (region=VN), không fallback mock
+   AUTH — Supabase Auth qua backend
+   ============================================================ */
+export const authService = {
+  async login(email: string, password: string): Promise<User> {
+    const res = await http<{ user: User; accessToken: string }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+    setToken(res.accessToken)
+    return res.user
+  },
+  async register(username: string, email: string, password: string, fullName?: string): Promise<User> {
+    const res = await http<{ user: User; accessToken: string | null }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ username, email, password, fullName: fullName ?? username }),
+    })
+    if (res.accessToken) setToken(res.accessToken)
+    return res.user
+  },
+  async me(): Promise<User | null> {
+    if (!accessToken) return null
+    try {
+      return await http<User>('/auth/me')
+    } catch {
+      return null
+    }
+  },
+  logout(): void {
+    setToken(null)
+  },
+}
+
+
+/* ============================================================
+   MAPPERS — Supabase → types của web
+   ============================================================ */
+interface RowMovie {
+  id: string
+  tmdb_id?: number | null
+  title: string
+  original_title?: string | null
+  overview?: string | null
+  duration_minutes?: number | null
+  genre?: string[] | null
+  release_date?: string | null
+  language?: string | null
+  certificate?: string | null
+  poster_url?: string | null
+  backdrop_url?: string | null
+  rating?: number | null
+  vote_count?: number | null
+  status?: string | null
+}
+
+interface RowCinema {
+  id: string
+  name: string
+  address?: string | null
+  district?: string | null
+  description?: string | null
+  room_count?: number | null
+}
+
+interface RowRoom {
+  id: string
+  cinema_id: string
+  name: string
+  rows?: number
+  cols?: number
+}
+
+interface RowShowtime {
+  id: string
+  movie_id: string
+  cinema_id: string
+  room_id: string
+  date: string
+  start_time: string
+  end_time: string
+  price_standard: number
+  price_vip: number
+}
+
+interface RowSeat {
+  id: string
+  row_label: string
+  seat_number: number
+  seat_type: string
+  status?: string
+}
+
+interface RowComment {
+  id: string
+  movie_id: string
+  name: string
+  content: string
+  rating: number
+  created_at: string
+}
+
+interface RowBooking {
+  id: string
+  booking_code: string
+  user_id: string
+  showtime_id: string
+  total_price: number
+  status: string
+  expires_at: string
+  created_at: string
+  seats?: Array<{ seat: RowSeat; price: number }>
+}
+
+const mapMovie = (m: RowMovie): Movie => ({
+  id: m.id,
+  tmdbId: m.tmdb_id ?? undefined,
+  title: m.title,
+  originalTitle: m.original_title ?? undefined,
+  description: m.overview ?? '',
+  durationMinutes: m.duration_minutes ?? 120,
+  genre: m.genre ?? [],
+  director: '',
+  cast: [],
+  releaseDate: m.release_date ?? '',
+  language: m.language ?? '',
+  rated: m.certificate ?? '',
+  status: (m.status as Movie['status']) ?? 'NOW_SHOWING',
+  hue: m.tmdb_id ? (m.tmdb_id * 47) % 360 : 30,
+  artIndex: m.tmdb_id ? (m.tmdb_id % 8) : 0,
+  rating: m.rating ?? 0,
+  reviewCount: m.vote_count ?? 0,
+  slug: String(m.tmdb_id ?? m.id),
+  posterUrl: m.poster_url ?? undefined,
+  backdropUrl: m.backdrop_url ?? undefined,
+})
+
+const mapShowtime = (s: RowShowtime): Showtime => ({
+  id: s.id,
+  movieId: s.movie_id,
+  cinemaId: s.cinema_id,
+  roomId: s.room_id,
+  date: s.date,
+  startTime: s.start_time,
+  endTime: s.end_time,
+  priceStandard: s.price_standard,
+  priceVip: s.price_vip,
+})
+
+/* ============================================================
+   MOVIES — đọc từ Supabase (bảng movies, do admin sync TMDB)
    ============================================================ */
 export const movieService = {
   async list(): Promise<Movie[]> {
-    await delay(150)
-    if (!tmdbService.enabled) fail('Thiếu TMDB API key (web/.env). Không hiển thị mock.', 'TMDB_DISABLED')
-    const now = await tmdbService.nowPlayingVN()
-    const up = await tmdbService.upcomingVN()
-    return [...now, ...up]
+    const rows = await http<RowMovie[]>('/movies')
+    return (rows ?? []).map(mapMovie)
   },
   async byId(id: string): Promise<Movie> {
-    await delay(200)
-    if (!isTmd(id)) fail('Phim không tồn tại trên TMDB.', 'MOVIE_NOT_FOUND')
-    return tmdbService.movieById(tmdId(id))
+    const m = await http<RowMovie>(`/movies/${id}`)
+    return mapMovie(m)
   },
   async showtimes(movieId: string): Promise<Showtime[]> {
-    await delay()
-    return showtimesForTmd(movieId)
+    const rows = await http<RowShowtime[]>(`/movies/${movieId}/showtimes`)
+    return (rows ?? []).map(mapShowtime)
   },
   async comments(movieId: string): Promise<Comment[]> {
-    if (!isTmd(movieId)) return []
-    return tmdbService.reviews(tmdId(movieId))
+    const rows = await http<RowComment[]>(`/movies/${movieId}/comments`)
+    return (rows ?? []).map((c) => ({
+      id: c.id,
+      movieId: c.movie_id,
+      name: c.name,
+      email: '',
+      content: c.content,
+      rating: c.rating,
+      createdAt: c.created_at,
+    }))
   },
 }
 
+
+/* ============================================================
+   CINEMAS / ROOMS
+   ============================================================ */
 export const cinemaService = {
   async list(): Promise<Cinema[]> {
-    await delay()
-    return clone(MOCK_CINEMAS)
+    const rows = await http<Array<RowCinema & { rooms?: { count?: number } }>>('/cinemas')
+    return (rows ?? []).map((c) => ({
+      id: c.id,
+      name: c.name,
+      address: c.address ?? '',
+      district: c.district ?? '',
+      description: c.description ?? '',
+      rooms: c.room_count ?? c.rooms?.count ?? 1,
+    }))
   },
   async byId(id: string): Promise<Cinema> {
-    await delay(250)
-    const c = MOCK_CINEMAS.find((x) => x.id === id)
-    if (!c) fail('Không tìm thấy rạp.', 'CINEMA_NOT_FOUND')
-    return clone(c!)
+    return (await cinemaService.list()).find((c) => c.id === id) ?? fail('Không tìm thấy rạp.', 'CINEMA_NOT_FOUND')
   },
   async room(roomId: string): Promise<{ room: Room; cinema: Cinema }> {
-    await delay()
-    const room = MOCK_ROOMS.find((r) => r.id === roomId)
-    if (!room) fail('Không tìm thấy phòng chiếu.', 'ROOM_NOT_FOUND')
-    const cinema = MOCK_CINEMAS.find((c) => c.id === room!.cinemaId)!
-    return { room: clone(room!), cinema: clone(cinema) }
-  },
-}
-
-export const seatService = {
-  async seatsFor(showtimeId: string, roomId: string): Promise<Seat[]> {
-    await delay(400)
-    await showtimeService.byId(showtimeId)
-
-    // Sơ đồ ghế deterministic từ showtimeId (data hệ thống CINEGA)
-    const rows = 9
-    const cols = 13
-    const rowLabels = 'ABCDEFGHI'.slice(0, rows)
-    const vipStartRow = rows - 2
-    let seed = 0
-    for (const ch of showtimeId) seed += ch.charCodeAt(0)
-
-    const seats: Seat[] = []
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const isVip = r >= vipStartRow
-        const pseudo = (seed * (r + 3) * (c + 5) * 2654435761) % 100
-        seats.push({
-          id: `${roomId}-${rowLabels[r]}${c + 1}`,
-          roomId,
-          rowLabel: rowLabels[r],
-          seatNumber: c + 1,
-          seatType: isVip ? 'VIP' : 'STANDARD',
-          status: pseudo < 12 ? 'BOOKED' : 'AVAILABLE',
-        })
-      }
+    const { room, cinema } = await http<{ room: RowRoom; cinema: RowCinema }>(`/rooms/${roomId}`)
+    return {
+      room: { id: room.id, cinemaId: room.cinema_id, name: room.name, rows: room.rows ?? 9, cols: room.cols ?? 13 },
+      cinema: { id: cinema.id, name: cinema.name, address: cinema.address ?? '', district: cinema.district ?? '', description: cinema.description ?? '', rooms: cinema.room_count ?? 1 },
     }
-    return seats
   },
 }
+
+/* ============================================================
+   SHOWTIMES
+   ============================================================ */
+export const showtimeService = {
+  async byId(id: string): Promise<Showtime> {
+    const s = await http<RowShowtime>(`/showtimes/${id}`)
+    return mapShowtime(s)
+  },
+  async byMovie(movieId: string): Promise<Showtime[]> {
+    return movieService.showtimes(movieId)
+  },
+  async all(): Promise<Showtime[]> {
+    const rows = await http<RowShowtime[]>('/admin/showtimes')
+    return (rows ?? []).map(mapShowtime)
+  },
+  async add(st: Omit<Showtime, 'id'>): Promise<Showtime> {
+    const created = await http<RowShowtime>('/admin/showtimes', {
+      method: 'POST',
+      body: JSON.stringify({
+        movie_id: st.movieId, cinema_id: st.cinemaId, room_id: st.roomId,
+        date: st.date, start_time: st.startTime, end_time: st.endTime,
+        price_standard: st.priceStandard, price_vip: st.priceVip,
+      }),
+    })
+    return mapShowtime(created)
+  },
+  async update(id: string, patch: Partial<Omit<Showtime, 'id'>>): Promise<Showtime> {
+    const updated = await http<RowShowtime>(`/admin/showtimes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ movie_id: patch.movieId, cinema_id: patch.cinemaId, room_id: patch.roomId, date: patch.date, start_time: patch.startTime, end_time: patch.endTime, price_standard: patch.priceStandard, price_vip: patch.priceVip }),
+    })
+    return mapShowtime(updated)
+  },
+  async delete(id: string): Promise<void> {
+    await http<void>(`/admin/showtimes/${id}`, { method: 'DELETE' })
+  },
+}
+
+/* ============================================================
+   SEATS — đọc sơ đồ ghế + trạng thái từ backend
+   ============================================================ */
+export const seatService = {
+  async seatsFor(showtimeId: string, _roomId?: string): Promise<Seat[]> {
+    const rows = await http<RowSeat[]>(`/showtimes/${showtimeId}/seats`)
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      roomId: '',
+      rowLabel: r.row_label,
+      seatNumber: r.seat_number,
+      seatType: r.seat_type === 'VIP' ? 'VIP' : 'STANDARD',
+      status: (r.status as Seat['status']) ?? 'AVAILABLE',
+    }))
+  },
+}
+
+/* ============================================================
+   BOOKINGS — tạo booking real qua backend
+   ============================================================ */
+const mapBooking = (b: RowBooking): Booking => ({
+  id: b.id,
+  bookingCode: b.booking_code,
+  userId: b.user_id,
+  showtimeId: b.showtime_id,
+  movieId: '',
+  totalPrice: b.total_price,
+  status: b.status as Booking['status'],
+  expiresAt: b.expires_at,
+  createdAt: b.created_at,
+  seats: (b.seats ?? []).map((row) => ({
+    id: row.seat.id, roomId: '', rowLabel: row.seat.row_label,
+    seatNumber: row.seat.seat_number,
+    seatType: row.seat.seat_type === 'VIP' ? 'VIP' : 'STANDARD',
+    status: 'SELECTED' as const,
+  })),
+})
 
 export const bookingService = {
   async create(showtimeId: string, seatIds: string[]): Promise<Booking> {
-    await delay(600)
-    const st = await showtimeService.byId(showtimeId)
-    if (seatIds.length === 0) fail('Vui lòng chọn ít nhất một ghế.', 'NO_SEATS_SELECTED')
-    const showtime: Showtime = clone(st!)
-    const seats = await seatService.seatsFor(showtimeId, showtime.roomId)
-    const selected = seats.filter((s) => seatIds.includes(s.id))
-    const totalPrice = selected.reduce(
-      (sum, s) => sum + (s.seatType === 'VIP' ? showtime.priceVip : showtime.priceStandard),
-      0,
-    )
-
-    const booking: Booking = {
-      id: `bk${Math.floor(Math.random() * 100000)}`,
-      bookingCode: `CINEGA${Math.floor(10000 + Math.random() * 90000)}`,
-      userId: 'u2',
-      showtimeId,
-      movieId: showtime.movieId,
-      totalPrice,
-      status: 'PENDING_PAYMENT',
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      createdAt: new Date().toISOString(),
-      seats: selected,
-    }
-    const saved = JSON.parse(localStorage.getItem('cinera_bookings') ?? '[]') as Booking[]
-    saved.push(booking)
-    localStorage.setItem('cinera_bookings', JSON.stringify(saved))
-    return clone(booking)
+    if (!accessToken) fail('Vui lòng đăng nhập để đặt vé.', 'UNAUTHORIZED')
+    const b = await http<RowBooking>('/bookings', { method: 'POST', body: JSON.stringify({ showtimeId, seatIds }) })
+    return mapBooking(b)
   },
-
   async byId(id: string): Promise<Booking> {
-    await delay(250)
-    const saved = JSON.parse(localStorage.getItem('cinera_bookings') ?? '[]') as Booking[]
-    const b = saved.find((x) => x.id === id)
-    if (!b) fail('Không tìm thấy đặt vé.', 'BOOKING_NOT_FOUND')
-    return clone(b!)
+    return mapBooking(await http<RowBooking>(`/bookings/${id}`))
   },
-
   async markPaid(id: string): Promise<Booking> {
-    await delay(400)
-    const saved = JSON.parse(localStorage.getItem('cinera_bookings') ?? '[]') as Booking[]
-    const idx = saved.findIndex((x) => x.id === id)
-    if (idx < 0) fail('Không tìm thấy đặt vé.', 'BOOKING_NOT_FOUND')
-    saved[idx].status = 'PAID'
-    localStorage.setItem('cinera_bookings', JSON.stringify(saved))
-    return clone(saved[idx])
+    const b = await http<RowBooking>(`/bookings/${id}/mock-pay`, { method: 'POST' })
+    return { ...(await this.byId(id)), status: b.status as Booking['status'] }
   },
-
   async mine(): Promise<Booking[]> {
-    await delay()
-    const saved = JSON.parse(localStorage.getItem('cinera_bookings') ?? '[]') as Booking[]
-    return clone(saved)
+    const rows = await http<RowBooking[]>('/bookings')
+    return (rows ?? []).map(mapBooking)
   },
 }
 
-export const authService = {
-  async login(username: string, password: string): Promise<User> {
-    await delay(600)
-    const user = MOCK_USERS.find((u) => u.username === username)
-    if (!user || password.length < 3) fail('Tên đăng nhập hoặc mật khẩu không đúng.', 'INVALID_CREDENTIALS')
-    localStorage.setItem('cinera_session', JSON.stringify({ userId: user!.id }))
-    return clone(user!)
-  },
-  async register(username: string, email: string, password: string): Promise<User> {
-    await delay(600)
-    if (MOCK_USERS.some((u) => u.username === username)) fail('Tên đăng nhập đã tồn tại.', 'USERNAME_TAKEN')
-    const user: User = { id: `u${Date.now()}`, username, email, fullName: username, role: 'USER' }
-    MOCK_USERS.push(user)
-    localStorage.setItem('cinera_session', JSON.stringify({ userId: user.id }))
-    return clone(user)
-  },
-  async me(): Promise<User | null> {
-    await delay(150)
-    const raw = localStorage.getItem('cinera_session')
-    if (!raw) return null
-    const { userId } = JSON.parse(raw) as { userId: string }
-    const user = MOCK_USERS.find((u) => u.id === userId) ?? null
-    return user ? clone(user) : null
-  },
-  logout(): void {
-    localStorage.removeItem('cinera_session')
-    localStorage.removeItem('cinera_guest')
-  },
-}
+/* Khởi tạo token từ localStorage (persist qua reload) */
+try { setToken(localStorage.getItem('cinega_token')) } catch { /* ssr */ }

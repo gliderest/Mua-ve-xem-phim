@@ -5,13 +5,59 @@ import { requireAuth } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
 import { AppError } from '../middleware/error.js'
 import { ok } from '../lib/api.js'
+import { env } from '../config/env.js'
 import type { Request } from 'express'
 
 export const catalogRouter = Router()
 
+/* ---------------- Sync TMDB on-empty (để lần đầu có phim ngay) ---------------- */
+const TMDB_GENRES: Record<number, string> = {
+  28: 'Hành động', 12: 'Phiêu lưu', 16: 'Hoạt hình', 35: 'Hài', 80: 'Tội phạm',
+  18: 'Chính kịch', 10751: 'Gia đình', 14: 'Kỳ ảo', 36: 'Lịch sử', 27: 'Kinh dị',
+  10402: 'Âm nhạc', 9648: 'Bí ẩn', 10749: 'Lãng mạn', 878: 'Khoa học viễn tưởng',
+  53: 'Giật gân', 10752: 'Chiến tranh', 37: 'Miền Tây', 99: 'Tài liệu', 10770: 'TV Movie',
+}
+
+async function syncTmdIfEmpty() {
+  const { count } = await supabaseAdmin.from('movies').select('*', { count: 'exact', head: true })
+  if ((count ?? 0) > 0 || !env.TMDB_API_KEY) return
+  for (const path of ['/movie/now_playing?language=vi-VN&region=VN&page=1', '/movie/upcoming?language=vi-VN&region=VN&page=1']) {
+    try {
+      const r = await fetch(`https://api.themoviedb.org/3${path}&api_key=${env.TMDB_API_KEY}`)
+      if (!r.ok) continue
+      const j = (await r.json()) as { results?: Array<{
+        id: number; title: string; original_title: string; overview: string; release_date: string;
+        poster_path: string | null; backdrop_path: string | null; vote_average: number; vote_count: number; genre_ids?: number[]; runtime?: number;
+      }> }
+      for (const m of j.results ?? []) {
+        await supabaseAdmin.from('movies').upsert(
+          {
+            tmdb_id: m.id,
+            title: m.title || m.original_title,
+            original_title: m.original_title,
+            overview: m.overview?.trim() || null,
+            duration_minutes: m.runtime ?? null,
+            genre: (m.genre_ids ?? []).slice(0, 3).map((g) => TMDB_GENRES[g] ?? `#${g}`),
+            release_date: m.release_date || null,
+            poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+            backdrop_url: m.backdrop_path ? `https://image.tmdb.org/t/p/w1280${m.backdrop_path}` : null,
+            rating: m.vote_average ? Math.round(m.vote_average * 10) / 10 : 0,
+            vote_count: m.vote_count ?? 0,
+            status: m.release_date && m.release_date <= new Date().toISOString().slice(0, 10) ? 'NOW_SHOWING' : 'COMING_SOON',
+          },
+          { onConflict: 'tmdb_id' },
+        )
+      }
+    } catch {
+      /* giữ nguyên nếu lỗi mạng */
+    }
+  }
+}
+
 /* ---------------- Movies ---------------- */
 catalogRouter.get('/movies', async (req: Request, res, next) => {
   try {
+    void syncTmdIfEmpty()
     const status = req.query.status as string | undefined
     let query = supabaseAdmin.from('movies').select('*').order('release_date', { ascending: false })
     if (status && ['NOW_SHOWING', 'COMING_SOON', 'ENDED'].includes(status)) {
@@ -61,6 +107,17 @@ catalogRouter.get('/cinemas/:id', async (req: Request, res, next) => {
     if (error) throw error
     if (!data) throw new AppError('Không tìm thấy rạp.', 404, 'CINEMA_NOT_FOUND')
     ok(res, data)
+  } catch (e) { next(e) }
+})
+
+catalogRouter.get('/rooms/:id', async (req: Request, res, next) => {
+  try {
+    const { data: room, error: roomErr } = await supabaseAdmin
+      .from('rooms').select('*').eq('id', req.params.id).maybeSingle()
+    if (roomErr || !room) throw new AppError('Không tìm thấy phòng chiếu.', 404, 'ROOM_NOT_FOUND')
+    const { data: cinema } = await supabaseAdmin
+      .from('cinemas').select('*').eq('id', room.cinema_id).maybeSingle()
+    ok(res, { room, cinema })
   } catch (e) { next(e) }
 })
 

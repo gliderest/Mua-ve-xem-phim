@@ -6,7 +6,7 @@ import { IconAlert, IconUser } from '@/components/svg/Icons'
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -16,7 +16,7 @@ export function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      const user = await login(username, password)
+      const user = await login(email, password)
       navigate(user.role === 'ADMIN' ? '/admin' : '/', { replace: true })
     } catch (err) {
       setError((err as Error).message)
@@ -41,13 +41,14 @@ export function LoginPage() {
           )}
 
           <div className="field">
-            <label htmlFor="username">Tên đăng nhập</label>
+            <label htmlFor="email">Email</label>
             <input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="VD: minh (demo)"
-              autoComplete="username"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="ban@email.com"
+              autoComplete="email"
               required
             />
           </div>

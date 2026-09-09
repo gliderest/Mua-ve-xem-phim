@@ -1,6 +1,8 @@
 import express, { type Request } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import path from 'node:path'
+import fs from 'node:fs'
 import { env } from './config/env.js'
 import { supabaseAdmin } from './config/supabase.js'
 import { errorHandler, notFound } from './middleware/error.js'
@@ -28,7 +30,7 @@ app.use(healthRouter)
 
 // API endpoints
 app.use('/api/auth', authRouter)
-app.use('/api', catalogRouter) // /movies, /cinemas, /showtimes, ...
+app.use('/api', catalogRouter) // /movies, /cinemas, /rooms, /showtimes, ...
 app.use('/api', bookingRouter) // /bookings, /bookings/:id/mock-pay
 app.use('/api', contactRouter) // /contact
 app.use('/api', sepayWebhookRouter) // /api/webhooks/sepay
@@ -57,6 +59,26 @@ app.post('/api/views', async (req: Request, res, next) => {
     } catch (e) { next(e) }
   }
 })
+
+/* ============================================================
+   Static: phục vụ web/dist (1 Web Service chạy cả API + giao diện)
+   ============================================================ */
+const webDistCandidates = [
+  path.resolve(process.cwd(), '../web/dist'),
+  path.resolve(process.cwd(), 'web/dist'),
+  path.resolve(process.cwd(), '../dist'),
+]
+const webDist = webDistCandidates.find((p) => fs.existsSync(path.join(p, 'index.html')))
+
+if (webDist) {
+  app.use(express.static(webDist))
+  // SPA fallback: các route không phải /api trả index.html
+  app.get(/^\/?(?!api(\/|$)).*/, (_req, res, next) => {
+    res.sendFile(path.join(webDist, 'index.html'), (err) => {
+      if (err) next(err)
+    })
+  })
+}
 
 app.use(notFound)
 app.use(errorHandler)
