@@ -58,3 +58,5 @@ mobile/.expo-shared/
 # ==== Misc ====
 cypress/videos/
 cypress/screenshots/
+# ==== Backend build ====
+backend/dist/

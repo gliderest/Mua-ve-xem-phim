@@ -33,7 +33,7 @@ export function ContactPage() {
           Chúng tôi <em>lắng nghe</em>
         </h1>
         <p style={{ color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
-          Mọi thắc mắc về đặt vé, khiếu nại hoặc góp ý — CINÉRA phản hồi trong vòng 24 giờ.
+          Mọi thắc mắc về đặt vé, khiếu nại hoặc góp ý — CINEGA phản hồi trong vòng 24 giờ.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 'var(--space-6)', marginTop: 'var(--space-6)', alignItems: 'start' }}>
@@ -61,7 +61,7 @@ export function ContactPage() {
 
             {status === 'success' && (
               <div className="alert alert--success" style={{ marginBottom: 'var(--space-4)' }}>
-                <IconCheck size={20} /> Đã nhận thông điệp của bạn. Cảm ơn đã liên hệ CINÉRA!
+                <IconCheck size={20} /> Đã nhận thông điệp của bạn. Cảm ơn đã liên hệ CINEGA!
               </div>
             )}
             {status === 'error' && (

@@ -78,7 +78,7 @@ export function CommentSection({ movieId }: { movieId: string }) {
             <h3 style={{ marginBottom: 'var(--space-4)' }}>Để lại nhận xét</h3>
             {submitted && (
               <div className="alert alert--success" style={{ marginBottom: 'var(--space-4)' }}>
-                <IconCheck size={20} /> Đã nhận ghi nhận của bạn. Bình luận &amp; đánh giá hệ thống CINÉRA sẽ được lưu khi backend hoàn thiện (Phase 2).
+                <IconCheck size={20} /> Đã nhận ghi nhận của bạn. Bình luận &amp; đánh giá hệ thống CINEGA sẽ được lưu khi backend hoàn thiện (Phase 2).
               </div>
             )}
             <div className="field">

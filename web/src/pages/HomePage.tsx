@@ -25,7 +25,7 @@ export function HomePage() {
   return (
     <>
       <Hero movies={nowShowing.slice(0, 8)} />
-      <SectionHeader title={<em>Đang chiếu</em>} sub="Phim đang chiếu tại các rạp CINÉRA" to="/movies" />
+      <SectionHeader title={<em>Đang chiếu</em>} sub="Phim đang chiếu tại các rạp CINEGA" to="/movies" />
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
           {loading ? (
@@ -176,7 +176,7 @@ function Hero({ movies }: { movies: Movie[] }) {
                 <span className="hero__title-line"><span>một <em>bộ phim</em>.</span></span>
               </h1>
               <p className="hero__lede">
-                CINÉRA mang đến trải nghiệm điện ảnh đẳng cấp: ghế ngồi thoải mái, âm thanh sống động,
+                CINEGA mang đến trải nghiệm điện ảnh đẳng cấp: ghế ngồi thoải mái, âm thanh sống động,
                 đặt vé và thanh toán chuyển khoản trong vài phút.
               </p>
               <div className="hero__actions">
@@ -237,9 +237,9 @@ function CinemaStrip() {
         </div>
         <div className="showtimes-grid">
           {[
-            { name: 'CINÉRA Landmark 81', desc: 'Phòng chiếu cao nhất Việt Nam', place: 'Bình Thạnh, TP.HCM' },
-            { name: 'CINÉRA Royal Center', desc: 'Không gian cổ điển hoài niệm', place: 'Tràng Tiền, Hà Nội' },
-            { name: 'CINÉRA The Riviera', desc: 'Ghế massage cao cấp', place: 'Nguyễn Hữu Thọ, TP.HCM' },
+            { name: 'CINEGA Landmark 81', desc: 'Phòng chiếu cao nhất Việt Nam', place: 'Bình Thạnh, TP.HCM' },
+            { name: 'CINEGA Royal Center', desc: 'Không gian cổ điển hoài niệm', place: 'Tràng Tiền, Hà Nội' },
+            { name: 'CINEGA The Riviera', desc: 'Ghế massage cao cấp', place: 'Nguyễn Hữu Thọ, TP.HCM' },
           ].map((c) => (
             <article className="card showtime-card" key={c.name}>
               <div className="showtime-card__head">

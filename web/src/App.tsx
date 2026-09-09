@@ -27,7 +27,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 
   componentDidCatch(err: Error) {
     // eslint-disable-next-line no-console
-    console.error('CINÉRA caught error:', err)
+    console.error('CINEGA caught error:', err)
   }
 
   render() {

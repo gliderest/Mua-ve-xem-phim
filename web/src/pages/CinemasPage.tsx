@@ -19,7 +19,7 @@ export function CinemasPage() {
         <div className="container">
           <span className="eyebrow">Hệ thống rạp</span>
           <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
-            Các rạp chiếu <em>CINÉRA</em>
+            Các rạp chiếu <em>CINEGA</em>
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
             Trải nghiệm màn hình lớn, âm thanh sống động tại các cụm rạp cao cấp trên toàn quốc.

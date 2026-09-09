@@ -7,10 +7,10 @@ import { tmdbService } from '@/services/tmdb'
 import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from '@/types'
 
 /* ============================================================
-   CINÉRA — Service layer (prototype)
+   CINEGA — Service layer (prototype)
    - PHIM: 100% lấy trực tiếp từ TMDB (region=VN). KHÔNG mock.
    - Rạp/phòng/suất chiếu/ghế/auth: là dữ liệu riêng của hệ thống
-     CINÉRA (TMDB không cung cấp) — chờ backend thật ở Phase 2.
+     CINEGA (TMDB không cung cấp) — chờ backend thật ở Phase 2.
    ============================================================ */
 
 const delay = (ms = 250) => new Promise((res) => setTimeout(res, ms))
@@ -116,7 +116,7 @@ function mergedShowtimes(movieId: string): Showtime[] {
   return [...filteredDefaults, ...saved]
 }
 
-/** Tra cứu suất chiếu (data hệ thống CINÉRA) */
+/** Tra cứu suất chiếu (data hệ thống CINEGA) */
 export const showtimeService = {
   async byId(id: string): Promise<Showtime> {
     // Tìm trong cache + saved
@@ -235,7 +235,7 @@ export const seatService = {
     await delay(400)
     await showtimeService.byId(showtimeId)
 
-    // Sơ đồ ghế deterministic từ showtimeId (data hệ thống CINÉRA)
+    // Sơ đồ ghế deterministic từ showtimeId (data hệ thống CINEGA)
     const rows = 9
     const cols = 13
     const rowLabels = 'ABCDEFGHI'.slice(0, rows)
@@ -277,7 +277,7 @@ export const bookingService = {
 
     const booking: Booking = {
       id: `bk${Math.floor(Math.random() * 100000)}`,
-      bookingCode: `CINÉRA${Math.floor(10000 + Math.random() * 90000)}`,
+      bookingCode: `CINEGA${Math.floor(10000 + Math.random() * 90000)}`,
       userId: 'u2',
       showtimeId,
       movieId: showtime.movieId,

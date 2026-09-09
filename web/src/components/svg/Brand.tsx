@@ -1,5 +1,5 @@
 /* ============================================================
-   CINÉRA — Logo & brand SVGs (tự vẽ, không copy)
+   CINEGA — Logo & brand SVGs (tự vẽ, không copy)
    ============================================================ */
 import type { CSSProperties } from 'react'
 
@@ -9,7 +9,7 @@ interface LogoProps {
   style?: CSSProperties
 }
 
-/** Logo CINÉRA — cuộn phim cách điệu */
+/** Logo CINEGA — cuộn phim cách điệu */
 export function LogoMark({ size = 34, className, style }: LogoProps) {
   return (
     <svg
@@ -35,7 +35,7 @@ export function LogoMark({ size = 34, className, style }: LogoProps) {
 export function BrandText({ className }: { className?: string }) {
   return (
     <span className={className}>
-      CINÉRA<span className="nav__logo-dot">.</span>
+      CINEGA<span className="nav__logo-dot">.</span>
     </span>
   )
 }

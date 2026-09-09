@@ -1,5 +1,5 @@
 /* ============================================================
-   CINÉRA — Icon system (SVG tự vẽ, nét mảnh, consistent)
+   CINEGA — Icon system (SVG tự vẽ, nét mảnh, consistent)
    KHÔNG dùng thư viện icon.
    ============================================================ */
 

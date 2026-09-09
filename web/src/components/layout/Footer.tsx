@@ -26,7 +26,7 @@ export function Footer() {
           </div>
           <div className="footer__col">
             <h4>Hỗ trợ</h4>
-            <Link to="/about">Về CINÉRA</Link>
+            <Link to="/about">Về CINEGA</Link>
             <Link to="/contact">Liên hệ</Link>
           </div>
           <div className="footer__col">
@@ -39,7 +39,7 @@ export function Footer() {
           </div>
         </div>
         <div className="footer__bottom">
-          <span>© 2026 CINÉRA Cinema. Đồ án môn Lập trình Web.</span>
+          <span>© 2026 CINEGA Cinema. Đồ án môn Lập trình Web.</span>
           <span>Thiết kế &amp; phát triển nguyên gốc — không copy template.</span>
         </div>
       </div>

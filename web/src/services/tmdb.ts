@@ -58,7 +58,7 @@ async function genres(): Promise<Map<number, string>> {
   return genreCache
 }
 
-/** Chuyển kết quả TMDB thành Movie của CINÉRA */
+/** Chuyển kết quả TMDB thành Movie của CINEGA */
 async function mapMovie(t: TMovie): Promise<Movie> {
   const g = await genres()
   const genre = (t.genre_ids ?? []).slice(0, 3).map((id) => g.get(id) ?? `#${id}`)

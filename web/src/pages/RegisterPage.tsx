@@ -40,7 +40,7 @@ export function RegisterPage() {
       <div className="container">
         <form className="card auth-card" onSubmit={submit}>
           <h1 className="auth-card__title">
-            Tạo tài khoản <em>CINÉRA</em>
+            Tạo tài khoản <em>CINEGA</em>
           </h1>
           <p className="auth-card__sub">Đặt vé nhanh hơn, lưu vé điện tử ngay trong tài khoản.</p>
 

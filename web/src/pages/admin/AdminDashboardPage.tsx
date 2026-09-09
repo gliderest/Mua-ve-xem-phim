@@ -16,7 +16,7 @@ export function AdminDashboardPage() {
           <div>
             <span className="eyebrow">Quản trị</span>
             <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
-              Bảng điều khiển <em>CINÉRA</em>
+              Bảng điều khiển <em>CINEGA</em>
             </h1>
           </div>
         </div>

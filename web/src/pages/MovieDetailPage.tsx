@@ -220,7 +220,7 @@ function SectionShowtimes({ groupedByCinema, dates, cinemas, selectedDate, onDat
               return (
                 <article className="card showtime-card" key={cinemaId}>
                   <div className="showtime-card__head">
-                    <h3 className="showtime-card__cinema">{cinema?.name ?? 'CINÉRA'}</h3>
+                    <h3 className="showtime-card__cinema">{cinema?.name ?? 'CINEGA'}</h3>
                     <span className="badge">{cinema?.district}</span>
                   </div>
                   <div className="showtime-chip-list">

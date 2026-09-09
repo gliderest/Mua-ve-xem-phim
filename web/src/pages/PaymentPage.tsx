@@ -150,7 +150,7 @@ if (loading) {
           </div>
           <div className="payment-bank-row">
             <span>Chủ tài khoản</span>
-            <strong>CINÉRA ENTERTAINMENT</strong>
+            <strong>CINEGA ENTERTAINMENT</strong>
           </div>
           <div style={{ marginTop: 'var(--space-4)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>

@@ -32,7 +32,7 @@ export function LoginPage() {
           <h1 className="auth-card__title">
             Chào mừng <em>trở lại</em>
           </h1>
-          <p className="auth-card__sub">Đăng nhập CINÉRA để đặt vé và quản lý vé của bạn.</p>
+          <p className="auth-card__sub">Đăng nhập CINEGA để đặt vé và quản lý vé của bạn.</p>
 
           {error && (
             <div className="alert alert--error" style={{ marginBottom: 'var(--space-4)' }}>

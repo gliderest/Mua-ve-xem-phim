@@ -27,7 +27,7 @@ export function Navbar() {
     <>
       <header className={`nav${scrolled ? ' is-scrolled' : ''}`}>
         <div className="container nav__inner">
-          <Link to="/" className="nav__logo" aria-label="CINÉRA — Trang chủ">
+          <Link to="/" className="nav__logo" aria-label="CINEGA — Trang chủ">
             <LogoMark size={30} />
             <BrandText />
           </Link>

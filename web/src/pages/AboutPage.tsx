@@ -12,7 +12,7 @@ export function AboutPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 'var(--space-7)', marginTop: 'var(--space-7)', alignItems: 'start' }}>
           <div style={{ display: 'grid', gap: 'var(--space-5)' }}>
             <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', lineHeight: 1.9 }}>
-              CINÉRA ra đời với sứ mệnh đưa điện ảnh đến gần hơn với khán giả Việt. Chúng tôi tin rằng một
+              CINEGA ra đời với sứ mệnh đưa điện ảnh đến gần hơn với khán giả Việt. Chúng tôi tin rằng một
               bộ phim hay không chỉ nằm ở câu chuyện trên màn ảnh — mà còn ở không gian, âm thanh, sự thoải
               mái của chiếc ghế bạn ngồi, và sự trọn vẹn của một buổi tối bạn chọn.
             </p>
@@ -37,7 +37,7 @@ export function AboutPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginTop: 'var(--space-7)' }}>
           {[
             { t: 'Công nghệ', d: 'Âm thanh Dolby Atmos, màn hình IMAX thế hệ mới, đặt vé và thanh toán trực tuyến trong vài phút.' },
-            { t: 'Thiết kế', d: 'Mỗi cụm rạp có ngôn ngữ thiết kế riêng, được vẽ và dựng bởi chính đội ngũ CINÉRA.' },
+            { t: 'Thiết kế', d: 'Mỗi cụm rạp có ngôn ngữ thiết kế riêng, được vẽ và dựng bởi chính đội ngũ CINEGA.' },
             { t: 'Con người', d: 'Đội ngũ nhân viên nhiệt tình, sẵn sàng hỗ trợ trước, trong và sau suất chiếu của bạn.' },
           ].map((item) => (
             <article className="card" key={item.t} style={{ padding: 'var(--space-5)' }}>

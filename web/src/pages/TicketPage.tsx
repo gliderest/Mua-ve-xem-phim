@@ -143,7 +143,7 @@ export function TicketPage() {
 
           <div className="ticket__foot">
             <span>Quét mã QR tại cửa rạp để đổi soát vé</span>
-            <span>CINÉRA</span>
+            <span>CINEGA</span>
           </div>
         </div>
 

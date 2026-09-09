@@ -1,12 +1,12 @@
 import type { Cinema, Comment, ContactMessage, Movie, Room, Showtime, User } from '@/types'
 
 /* ============================================================
-   CINÉRA — Mock data (prototype local, chưa có backend)
+   CINEGA — Mock data (prototype local, chưa có backend)
    Phase sau sẽ thay bằng Supabase thật.
    ============================================================ */
 
 export const MOCK_USERS: User[] = [
-  { id: 'u1', username: 'admin', email: 'admin@cinera.vn', fullName: 'Quản trị viên CINÉRA', role: 'ADMIN' },
+  { id: 'u1', username: 'admin', email: 'admin@cinera.vn', fullName: 'Quản trị viên CINEGA', role: 'ADMIN' },
   { id: 'u2', username: 'minh', email: 'minh.nguyen@gmail.com', fullName: 'Nguyễn Văn Minh', role: 'USER' },
   { id: 'u3', username: 'lan', email: 'lan.pham@yahoo.com', fullName: 'Phạm Thu Lan', role: 'USER' },
   { id: 'u4', username: 'anh', email: 'anh.tran@outlook.com', fullName: 'Trần Quốc Anh', role: 'USER' },
@@ -178,7 +178,7 @@ export const MOCK_MOVIES: Movie[] = [
 export const MOCK_CINEMAS: Cinema[] = [
   {
     id: 'c1',
-    name: 'CINÉRA Landmark 81',
+    name: 'CINEGA Landmark 81',
     address: 'Tầng 68, Vinhomes Landmark 81, Bình Thạnh, TP.HCM',
     description: 'Phòng chiếu cao nhất Việt Nam, hệ thống âm thanh Dolby Atmos thế hệ mới.',
     rooms: 6,
@@ -186,7 +186,7 @@ export const MOCK_CINEMAS: Cinema[] = [
   },
   {
     id: 'c2',
-    name: 'CINÉRA Royal Center',
+    name: 'CINEGA Royal Center',
     address: '30 Tràng Tiền, Hoàn Kiếm, Hà Nội',
     description: 'Rạp cổ điển hoài cổ được cải tạo, ghế bành bọc da thật, banner nghệ thuật.',
     rooms: 4,
@@ -194,7 +194,7 @@ export const MOCK_CINEMAS: Cinema[] = [
   },
   {
     id: 'c3',
-    name: 'CINÉRA The Riviera',
+    name: 'CINEGA The Riviera',
     address: 'Lầu 3, The Riviera Point, 36 Nguyễn Hữu Thọ, Q.7, TP.HCM',
     description: 'Phòng VIP với ghế massage, lounge riêng trước giờ chiếu.',
     rooms: 5,
@@ -238,7 +238,7 @@ export const MOCK_COMMENTS: Record<string, Comment[]> = {
   m1: [
     { id: 'cm1', movieId: 'm1', userId: 'u2', name: 'Nguyễn Văn Minh', email: 'minh.nguyen@gmail.com', content: 'Phim quá đẹp! Từng khung hình như một bức tranh. Đáng đồng tiền bát gạo nhất năm.', rating: 5, createdAt: '2026-08-25T10:00:00Z' },
     { id: 'cm2', movieId: 'm1', name: 'Hồng Vân', email: 'hongvan@example.com', content: 'Nhạc phim rất hay, mình khóc gần nửa bộ phim. Diễn viên chính xuất sắc.', rating: 4, createdAt: '2026-08-26T08:30:00Z' },
-    { id: 'cm3', movieId: 'm1', name: 'Duy Phong', email: 'duyphong@example.com', content: 'Được xem trên màn hình IMAX CINÉRA Landmark 81, trải nghiệm khó quên.', rating: 5, createdAt: '2026-08-27T19:15:00Z' },
+    { id: 'cm3', movieId: 'm1', name: 'Duy Phong', email: 'duyphong@example.com', content: 'Được xem trên màn hình IMAX CINEGA Landmark 81, trải nghiệm khó quên.', rating: 5, createdAt: '2026-08-27T19:15:00Z' },
   ],
   m2: [
     { id: 'cm4', movieId: 'm2', name: 'Kim Ngân', email: 'kimngan@example.com', content: 'Ám ảnh mà không rẻ tiền. Cốt truyện xoắn não, phải xem lại lần hai mới hết các chi tiết.', rating: 4, createdAt: '2026-09-06T09:00:00Z' },
@@ -256,15 +256,15 @@ export const MOCK_CONTACT_MESSAGES: ContactMessage[] = [
 export const MOCK_AD = {
   id: 'ad1',
   title: 'Đêm Sân Khấu Đặc Biệt',
-  description: 'Suất chiếu đặc biệt đêm 31/12: phim CINÉRA chọn lọc, bắn pháo hoa sau giờ chiếu tại Landmark 81.',
+  description: 'Suất chiếu đặc biệt đêm 31/12: phim CINEGA chọn lọc, bắn pháo hoa sau giờ chiếu tại Landmark 81.',
   cta: 'Đặt vé ngay',
   hue: 300,
 }
 
-/** Sinh mã đặt vé có prefix CINÉRA (theo kiến trúc #13) */
+/** Sinh mã đặt vé có prefix CINEGA (theo kiến trúc #13) */
 export const generateBookingCode = (): string => {
   const seq = Math.floor(10000 + Math.random() * 90000)
-  return `CINÉRA${seq}`
+  return `CINEGA${seq}`
 }
 
 export const formatVND = (amount: number): string =>
