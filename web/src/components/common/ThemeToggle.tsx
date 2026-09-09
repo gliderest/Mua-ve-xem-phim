@@ -6,7 +6,7 @@ const STORAGE = 'cinega_theme'
 function initialTheme(): 'light' | 'dark' {
   const saved = localStorage.getItem(STORAGE) as 'light' | 'dark' | null
   if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  return 'dark'
 }
 
 /** Nút chuyển Light/Dark — lưu localStorage, không thư viện. */
