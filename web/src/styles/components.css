@@ -13,12 +13,19 @@
   align-items: center;
   background: rgba(14, 14, 18, 0.62);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--border);
-  transition: background-color var(--duration-normal) var(--ease-out), border-color var(--duration-normal) var(--ease-out);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  transition: background var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
+  background: var(--grad-nav);
 }
 .nav.is-scrolled {
-  background: rgba(10, 10, 14, 0.92);
-  border-bottom-color: var(--border);
+  box-shadow: 0 10px 30px -16px rgba(0, 0, 0, 0.6);
+}
+.nav.is-scrolled:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  pointer-events: none;
 }
 
 .nav__inner {
@@ -28,6 +35,8 @@
   gap: var(--space-5);
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .nav__logo {
@@ -37,10 +46,10 @@
   font-family: var(--font-display);
   font-size: 1.6rem;
   letter-spacing: 0.22em;
-  color: var(--text-primary);
+  color: #fff;
 }
 .nav__logo .nav__logo-dot {
-  color: var(--accent);
+  color: #fff;
 }
 
 .nav__links {
@@ -55,7 +64,7 @@
   font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   padding-block: 0.5rem;
   transition: color var(--duration-normal) var(--ease-out);
 }
@@ -65,15 +74,16 @@
   left: 0;
   right: 0;
   bottom: 2px;
-  height: 1px;
-  background: var(--accent);
+  height: 2px;
+  border-radius: 2px;
+  background: #fff;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--duration-normal) var(--ease-out);
 }
 .nav__link:hover,
 .nav__link.is-active {
-  color: var(--text-primary);
+  color: #fff;
 }
 .nav__link:hover::after,
 .nav__link.is-active::after {
@@ -87,6 +97,32 @@
   justify-content: flex-end;
 }
 
+
+/* Nút trong navbar (trên nền cam) */
+.nav .btn--ghost {
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+.nav .btn--ghost:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+.nav .btn--gold {
+  background: #fff;
+  color: #cf4f00;
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.35);
+}
+.nav .btn--gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.4);
+}
+.nav__burger {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
 .nav__burger {
   display: none;
   align-items: center;
@@ -1530,4 +1566,63 @@
   padding-block: var(--space-5);
   border-bottom: 1px solid var(--border);
   background: var(--bg-deep);
+}
+/* ---------- Chữ phim sáng hơn (dark xám) ---------- */
+.movie-card__title { color: #ffffff; }
+.movie-card__desc { color: #dcd5c8; }
+.movie-card__meta { color: #b7af9f; }
+.movie-row__title { color: #ffffff; }
+.movie-row__meta { color: #b7af9f; }
+.movie-row {
+  background: linear-gradient(165deg, #30303a 0%, #25252c 100%);
+}
+.movie-row:hover {
+  background: #33333c;
+  border-color: rgba(232, 98, 12, 0.4);
+}
+
+/* ---------- Header Phim: ticker + float cam (no library) ---------- */
+.page-hero__fx {
+  position: relative;
+  margin-top: var(--space-5);
+  height: 36px;
+  overflow: hidden;
+}
+.page-hero__ticker {
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.page-hero__ticker-track {
+  display: flex;
+  gap: 30px;
+  width: max-content;
+  animation: marquee 26s linear infinite;
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  padding-inline: 12px;
+}
+.page-hero__float {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  opacity: 0.6;
+  animation: drift 5s var(--ease-spring) infinite;
+  pointer-events: none;
+}
+.page-hero__float--1 { top: 2px; right: 22%; }
+.page-hero__float--2 { bottom: 6px; right: 10%; width: 8px; height: 8px; background: #ffb06e; animation-delay: -2s; }
+.page-hero__float--3 { top: 10px; right: 40%; width: 6px; height: 6px; background: #fff; opacity: 0.4; animation-delay: -3.4s; }
+@media (prefers-reduced-motion: reduce) {
+  .page-hero__ticker-track,
+  .page-hero__float { animation: none; }
 }

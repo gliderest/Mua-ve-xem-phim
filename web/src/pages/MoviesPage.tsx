@@ -66,6 +66,18 @@ export function MoviesPage() {
               </div>
             </div>
           </div>
+
+          <div className="page-hero__fx" aria-hidden="true">
+            <span className="page-hero__float page-hero__float--1" />
+            <span className="page-hero__float page-hero__float--2" />
+            <span className="page-hero__float page-hero__float--3" />
+            <div className="page-hero__ticker">
+              <div className="page-hero__ticker-track">
+                <span>★ CINEGA</span><span>✦ ĐANG CHIẾU</span><span>★ NOW SHOWING</span><span>✦ SẮP CHIẾU</span><span>★ COMING SOON</span>
+                <span>★ CINEGA</span><span>✦ ĐANG CHIẾU</span><span>★ NOW SHOWING</span><span>✦ SẮP CHIẾU</span><span>★ COMING SOON</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
