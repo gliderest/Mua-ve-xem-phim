@@ -60,3 +60,8 @@ cypress/videos/
 cypress/screenshots/
 # ==== Backend build ====
 backend/dist/
+
+# Render env (gitignored)
+.env.render
+.env.production
+.env.production.local
