@@ -6,7 +6,7 @@ import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from
    Interface giữ nguyên để các trang không phải đổi.
    ============================================================ */
 
-const API = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api'
+const API = (import.meta.env.VITE_API_URL as string)?.trim() || ''
 
 export interface MockError extends Error {
   code?: string

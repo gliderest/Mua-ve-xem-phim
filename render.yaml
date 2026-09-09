@@ -1,0 +1,41 @@
+# ============================================================
+# CINEGA — Render blueprint (deploy 1 cú: API + Web trong 1 Web Service)
+# Sử dụng: Render Console → Blueprint → Connect repo → push này.
+# Sau đó đổi Service Name trong Settings thành `cinega`.
+# ============================================================
+services:
+  - type: web
+    name: cinega
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install && npm run build:backend && npm run build:web
+    startCommand: npm run start:backend
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false                       # điền trong Render Dashboard
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        value: https://cinega.onrender.com
+      - key: TMDB_API_KEY
+        sync: false
+      - key: SEPAY_API_KEY
+        sync: false
+      - key: SEPAY_WEBHOOK_SECRET
+        sync: false
+      - key: BANK_CODE
+        value: '970422'
+      - key: BANK_ACCOUNT_NUMBER
+        value: '1900123456789'
+      - key: BANK_ACCOUNT_NAME
+        value: CINEGA ENTERTAINMENT
