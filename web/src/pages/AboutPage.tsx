@@ -2,7 +2,13 @@ import { BrandText, LogoMark } from '@/components/svg/Brand'
 
 export function AboutPage() {
   return (
-    <section className="section section--page">
+    <section
+      className="section section--page cinema-photo"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1600&q=80)',
+      }}
+    >
       <div className="container">
         <span className="eyebrow">Về chúng tôi</span>
         <h1 className="section-title" style={{ marginTop: 'var(--space-3)', maxWidth: '16ch' }}>

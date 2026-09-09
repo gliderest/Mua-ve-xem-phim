@@ -1734,7 +1734,7 @@
   right: 0;
   bottom: 0;
   height: clamp(96px, 13vw, 180px);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--feather-dark) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -1779,7 +1779,7 @@
   right: 0;
   bottom: 0;
   height: clamp(72px, 9vw, 140px);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--feather-dark) 100%);
   pointer-events: none;
   z-index: 3;
 }
@@ -1794,7 +1794,39 @@
   right: 0;
   bottom: 0;
   height: clamp(56px, 7vw, 110px);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--feather-dark) 100%);
   pointer-events: none;
   z-index: 1;
+}
+
+/* ---------- Cinema photo backdrop (ràp chiếu, overlay tối) ---------- */
+.cinema-photo {
+  position: relative;
+  background-size: cover;
+  background-position: center 30%;
+}
+.cinema-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(9, 8, 7, 0.88) 0%, rgba(9, 8, 7, 0.55) 50%, rgba(9, 8, 7, 0.3) 100%);
+}
+.cinema-photo > .container {
+  position: relative;
+  z-index: 2;
+}
+.cinema-photo .section-title,
+.cinema-photo h1,
+.cinema-photo h2 {
+  color: #fff;
+}
+.cinema-photo .eyebrow {
+  color: #ffc79a;
+}
+.cinema-photo > .container > p,
+.cinema-photo .section-head p {
+  color: rgba(255, 255, 255, 0.85);
+}
+.cinema-strip {
+  border-block: 1px solid var(--border);
 }
