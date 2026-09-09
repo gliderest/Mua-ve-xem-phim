@@ -5,12 +5,14 @@ import { MovieCard } from '@/components/common/MovieCard'
 import { AdPopup } from '@/components/AdPopup'
 import { PosterArt } from '@/components/svg/PosterArt'
 import { IconPlay, IconArrowRight, IconArrowLeft, IconMapPin, IconTicket, IconClock } from '@/components/svg/Icons'
-import { gsap, prefersReducedMotion } from '@/lib/gsap'
+import { gsap, prefersReducedMotion, useReveal } from '@/lib/gsap'
 import type { Movie } from '@/types'
 
 export function HomePage() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
+  const listRef = useRef<HTMLDivElement>(null)
+  useReveal(listRef, [movies, loading])
 
   useEffect(() => {
     movieService
@@ -26,43 +28,51 @@ export function HomePage() {
     <>
       <Hero movies={nowShowing.slice(0, 8)} />
       <SectionHeader title={<em>Đang chiếu</em>} sub="Phim đang chiếu tại các rạp CINEGA" to="/movies" />
-      <section className="section" style={{ paddingTop: 0 }}>
-        <div className="container">
-          {loading ? (
-            <div className="loading-shimmer-grid">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="skeleton" />
-              ))}
-            </div>
-          ) : (
-            <div className="movies-grid">
-              {nowShowing.slice(0, 8).map((m) => (
-                <MovieCard key={m.id} movie={m} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <CinemaStrip />
-
-      <section className="section">
-        <div className="container">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">Sắp ra mắt</span>
-              <h2 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
-                Những bộ phim <em>đáng mong đợi</em>
-              </h2>
-            </div>
+      <div ref={listRef}>
+        <section className="section" style={{ paddingTop: 0 }}>
+          <div className="container">
+            {loading ? (
+              <div className="loading-shimmer-grid">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="skeleton" />
+                ))}
+              </div>
+            ) : nowShowing.length === 0 ? (
+              <div className="state-empty">Chưa có phim đang chiếu — quản trị viên đang cập nhật lịch chiếu.</div>
+            ) : (
+              <div className="movies-grid">
+                {nowShowing.slice(0, 8).map((m) => (
+                  <MovieCard key={m.id} movie={m} />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="movies-grid">
-            {comingSoon.slice(0, 4).map((m) => (
-              <MovieCard key={m.id} movie={m} />
-            ))}
+        </section>
+
+        <CinemaStrip />
+
+        <section className="section">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <span className="eyebrow">Sắp ra mắt</span>
+                <h2 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
+                  Những bộ phim <em>đáng mong đợi</em>
+                </h2>
+              </div>
+            </div>
+            {comingSoon.length > 0 ? (
+              <div className="movies-grid">
+                {comingSoon.slice(0, 4).map((m) => (
+                  <MovieCard key={m.id} movie={m} />
+                ))}
+              </div>
+            ) : (
+              <div className="state-empty">Sẽ cập nhật phim sắp chiếu từ TMDB.</div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <CtaBanner />
       <AdPopup />

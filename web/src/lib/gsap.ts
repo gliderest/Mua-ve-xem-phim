@@ -14,7 +14,7 @@ export const prefersReducedMotion = (): boolean =>
  * Scroll-reveal cho các element có [data-reveal].
  * Chỉ chạy 1 lần, dùng ScrollTrigger, không lắng nghe scroll thủ công.
  */
-export function useReveal(ref: RefObject<HTMLElement | null>) {
+export function useReveal(ref: RefObject<HTMLElement | null>, deps: unknown[] = []) {
   useEffect(() => {
     const el = ref.current
     if (!el || prefersReducedMotion()) {
@@ -25,11 +25,12 @@ export function useReveal(ref: RefObject<HTMLElement | null>) {
     if (targets.length === 0) return
 
     const ctx = gsap.context(() => {
-      targets.forEach((target) => {
+      targets.forEach((target, i) => {
         gsap.to(target, {
           y: 0,
           opacity: 1,
           duration: 0.9,
+          delay: Math.min(i * 0.06, 0.6),
           ease: 'power3.out',
           scrollTrigger: {
             trigger: target as HTMLElement,
@@ -38,9 +39,15 @@ export function useReveal(ref: RefObject<HTMLElement | null>) {
         })
       })
     }, el)
+    // Refresh sau khi DOM hoàn chỉnh (phim vừa load)
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 160)
 
-    return () => ctx.revert()
-  }, [ref])
+    return () => {
+      window.clearTimeout(t)
+      ctx.revert()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref, ...deps])
 }
 
 /** Page transition nhẹ: fade + translate */

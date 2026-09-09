@@ -19,7 +19,7 @@ export function MovieRow({ movie }: { movie: Movie }) {
   const isNow = movie.status === 'NOW_SHOWING'
 
   return (
-    <article className="movie-row">
+    <article className="movie-row" data-reveal>
       <Link to={`/movies/${movie.id}`} className="movie-row__poster" aria-label={`Xem phim ${movie.title}`}>
         <PosterOrArt movie={movie} />
       </Link>

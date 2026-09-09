@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { movieService } from '@/services/api'
+import { useReveal } from '@/lib/gsap'
+import { useRef } from 'react'
 import { MovieRow } from '@/components/common/MovieRow'
 import { IconSearch } from '@/components/svg/Icons'
 import type { Movie } from '@/types'
@@ -15,6 +17,8 @@ export function MoviesPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['key']>('ALL')
   const [query, setQuery] = useState('')
+  const listRef = useRef<HTMLDivElement>(null)
+  useReveal(listRef, [movies, loading])
 
   useEffect(() => {
     movieService.list().then(setMovies).finally(() => setLoading(false))
@@ -79,7 +83,7 @@ export function MoviesPage() {
               <p>Không tìm thấy phim phù hợp với bộ lọc của bạn.</p>
             </div>
           ) : (
-            <div className="movie-list">
+            <div className="movie-list" ref={listRef}>
               {filtered.map((m) => (
                 <MovieRow key={m.id} movie={m} />
               ))}
