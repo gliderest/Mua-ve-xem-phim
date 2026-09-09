@@ -45,6 +45,8 @@
   --grad-glass: linear-gradient(180deg, rgba(44, 44, 51, 0.94), rgba(20, 20, 25, 0.8));
     --grad-seat: linear-gradient(150deg, #ff8a3d, #e8620c);
   --grad-nav: linear-gradient(90deg, #c45500 0%, #ff8a3d 48%, #e8620c 100%);
+  --badge-bg: rgba(30, 30, 40, 0.96);
+  --feather-dark: #0f0f14;
   --shadow-soft: 0 10px 28px -14px rgba(0, 0, 0, 0.6);
   --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.35);
 
@@ -138,4 +140,6 @@
 
   --shadow-soft: 0 10px 28px -14px rgba(43, 31, 21, 0.16);
   --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.28);
+  --badge-bg: rgba(255, 255, 255, 0.94);
+  --feather-dark: #0f0f14;
 }

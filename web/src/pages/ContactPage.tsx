@@ -26,13 +26,19 @@ export function ContactPage() {
   }
 
   return (
-    <section className="section section--page">
+    <section
+      className="section section--page cinema-photo"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80)',
+      }}
+    >
       <div className="container" style={{ maxWidth: 960 }}>
         <span className="eyebrow">Liên hệ</span>
         <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
           Chúng tôi <em>lắng nghe</em>
         </h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
+        <p style={{ color: 'rgba(255,255,255,0.85)', marginTop: 'var(--space-2)' }}>
           Mọi thắc mắc về đặt vé, khiếu nại hoặc góp ý — CINEGA phản hồi trong vòng 24 giờ.
         </p>
 

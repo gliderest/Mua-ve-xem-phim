@@ -232,7 +232,13 @@ function Hero({ movies }: { movies: Movie[] }) {
 
 function CinemaStrip() {
   return (
-    <section className="section" style={{ background: 'var(--bg-deep)', borderBlock: '1px solid var(--border)' }}>
+    <section
+      className="section cinema-photo"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(https://images.unsplash.com/photo-1489599904471-84dd1d3fa594?auto=format&fit=crop&w=1800&q=80)',
+      }}
+    >
       <div className="container">
         <div className="section-head">
           <div>
