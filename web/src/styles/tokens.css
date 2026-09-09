@@ -1,46 +1,51 @@
 /* ============================================================
-   CINEGA — Design Tokens (LIGHT THEME — cam/trắng ấm)
-   Phong cách: premium warm light — cinematic nhưng sáng.
-   KHÔNG dùng thư viện — custom thuần.
+   CINEGA — Design Tokens (DARK THEME — accent cam)
+   Cinema mờ tối + cam nóng. 100% custom CSS.
    ============================================================ */
 
 :root {
-  /* ---- Nền (warm light) ---- */
-  --bg-deep: #f3ede1;
-  --bg-primary: #fbf7ef;
-  --bg-secondary: #f5eee2;
-  --surface: #ffffff;
-  --surface-2: #fffaf2;
-  --surface-3: #f1e7d7;
+  /* ---- Nền (dark) ---- */
+  --bg-deep: #07070a;
+  --bg-primary: #0d0d11;
+  --bg-secondary: #121218;
+  --surface: #191921;
+  --surface-2: #1f202a;
+  --surface-3: #272836;
 
-  /* ---- Text (espresso ấm) ---- */
-  --text-primary: #2b1f15;
-  --text-secondary: #5b4c3c;
-  --text-muted: #8a7a67;
-  --text-faint: #b8a995;
+  /* ---- Text (warm white) ---- */
+  --text-primary: #f4efe6;
+  --text-secondary: #cfc8ba;
+  --text-muted: #8f897c;
+  --text-faint: #5d574e;
 
-  /* ---- Accent (cam) ---- */
+  /* ---- Accent (cam nóng) ---- */
   --accent: #e8620c;
-  --accent-strong: #ff7c26;
+  --accent-strong: #ff8a3d;
   --accent-soft: #d25200;
-  --accent-glow: rgba(232, 98, 12, 0.18);
-  --accent-faint: rgba(232, 98, 12, 0.09);
+  --accent-glow: rgba(232, 98, 12, 0.22);
+  --accent-faint: rgba(232, 98, 12, 0.10);
 
-  /* ---- Trạng thái ---- */
-  --success: #2e9e5b;
-  --danger: #d8433f;
-  --warning: #e08e0b;
-  --info: #2f7fd1;
+  --success: #58c07e;
+  --danger: #f0716b;
+  --warning: #e8a13a;
+  --info: #74a6dc;
 
-  /* ---- Border ---- */
-  --border: rgba(43, 31, 21, 0.10);
-  --border-strong: rgba(43, 31, 21, 0.18);
-  --border-accent: rgba(232, 98, 12, 0.45);
+  --border: rgba(244, 239, 230, 0.10);
+  --border-strong: rgba(244, 239, 230, 0.18);
+  --border-accent: rgba(232, 98, 12, 0.5);
 
-  /* ---- Texture ---- */
   --radial-glow: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(232, 98, 12, 0.10), transparent 60%);
-  --radial-hero: radial-gradient(ellipse 70% 60% at 50% 108%, rgba(232, 98, 12, 0.14), transparent 55%);
+  --radial-hero: radial-gradient(ellipse 70% 60% at 50% 108%, rgba(232, 98, 12, 0.16), transparent 55%);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+
+  /* ---- Gradient & Shadow (dark) ---- */
+  --grad-body: linear-gradient(180deg, #17171e 0%, #101015 52%, #07070a 100%);
+  --grad-soft: linear-gradient(165deg, #20202a 0%, #17171f 100%);
+  --grad-gold: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #c24a00 100%);
+  --grad-glass: linear-gradient(180deg, rgba(32, 32, 42, 0.92), rgba(15, 15, 20, 0.75));
+  --grad-seat: linear-gradient(150deg, #ff8a3d, #e8620c);
+  --shadow-soft: 0 10px 28px -14px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.35);
 
   /* ---- Typography ---- */
   --font-display: "Cormorant Garamond", "Georgia", serif;
@@ -90,13 +95,4 @@
   --z-modal: 300;
   --z-toast: 400;
   --z-grain: 500;
-  /* ---- Gradient & Shadow tokens (light theme) ---- */
-  --grad-body: linear-gradient(180deg, #fffaf4 0%, #fdf3e7 52%, #f6e9d4 100%);
-  --grad-soft: linear-gradient(165deg, #ffffff 0%, #fff8ee 100%);
-  --grad-gold: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #cf4f00 100%);
-  --grad-dark: linear-gradient(180deg, #2b1f15 0%, #432b16 100%);
-  --grad-glass: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,252,246,0.6));
-  --grad-seat: linear-gradient(150deg, #ff8a3d, #e8620c);
-  --shadow-soft: 0 10px 28px -14px rgba(43, 31, 21, 0.14);
-  --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.25);
 }
