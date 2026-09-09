@@ -6,7 +6,8 @@ import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from
    Interface giữ nguyên để các trang không phải đổi.
    ============================================================ */
 
-const API = (import.meta.env.VITE_API_URL as string)?.trim() || ''
+const RAWVITE = ((import.meta.env.VITE_API_URL as string) ?? '').trim()
+const API = import.meta.env.PROD && (!RAWVITE || RAWVITE.includes('localhost')) ? '' : RAWVITE
 
 export interface MockError extends Error {
   code?: string
