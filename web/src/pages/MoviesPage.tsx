@@ -29,7 +29,7 @@ export function MoviesPage() {
 
   return (
     <>
-      <section className="section section--page">
+      <section className="section section--page page-hero--dark">
         <div className="container">
           <span className="eyebrow">Thư viện phim</span>
           <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
