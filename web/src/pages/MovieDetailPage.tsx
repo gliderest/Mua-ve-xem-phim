@@ -117,6 +117,13 @@ export function MovieDetailPage() {
         }
       >
         <div className="container detail-hero__inner">
+          <nav className="detail-crumb" aria-label="Breadcrumb">
+            <Link to="/">Trang chủ</Link>
+            <span className="detail-crumb__sep">/</span>
+            <Link to="/movies">Phim</Link>
+            <span className="detail-crumb__sep">/</span>
+            <span>{movie.title}</span>
+          </nav>
           <span className="badge badge--gold">
             {movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}
           </span>

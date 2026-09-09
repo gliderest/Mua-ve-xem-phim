@@ -1645,7 +1645,8 @@
 .detail-hero__inner {
   position: relative;
   z-index: 2;
-  width: 100%;
+  width: min(100% - clamp(2rem, 6vw, 4.5rem), var(--container));
+  margin-inline: auto;
   color: #fff;
 }
 .detail-hero--full .detail-info__title {
@@ -1723,4 +1724,49 @@
 }
 .theme-toggle:active {
   transform: scale(0.94);
+}
+
+/* ---------- MovieDetail: feather + breadcrumb polish ---------- */
+.detail-hero--full::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(96px, 13vw, 180px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.detail-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: var(--space-3);
+}
+.detail-crumb a {
+  color: rgba(255, 255, 255, 0.9);
+}
+.detail-crumb a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.detail-crumb__sep {
+  opacity: 0.5;
+}
+.detail-crumb span:last-child {
+  color: var(--accent-strong);
+}
+.detail-hero--full .detail-info__title {
+  line-height: 1.04;
+  max-width: 18ch;
+}
+.detail-info__desc--full {
+  line-height: 1.8;
+}
+.detail-trailer {
+  border-color: var(--border-accent);
 }
