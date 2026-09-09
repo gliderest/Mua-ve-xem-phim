@@ -7,7 +7,10 @@ import type { Booking, Cinema, Comment, Movie, Room, Seat, Showtime, User } from
    ============================================================ */
 
 const RAWVITE = ((import.meta.env.VITE_API_URL as string) ?? '').trim()
-const API = import.meta.env.PROD && (!RAWVITE || RAWVITE.includes('localhost')) ? '' : RAWVITE
+// Production: luôn dùng /api relative cùng origin (bỏ localhost nếu env set nhầm)
+const API = import.meta.env.PROD && (!RAWVITE || RAWVITE.includes('localhost'))
+  ? '/api'
+  : (RAWVITE || '/api')
 
 export interface MockError extends Error {
   code?: string
