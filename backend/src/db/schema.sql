@@ -163,6 +163,8 @@ create table advertisements (
   is_active boolean not null default true,
   dismiss_cookie text not null default 'movie_ad_closed',
   created_at timestamptz not null default now()
+);
+
 -- ---------- Enable RLS ----------
 alter table profiles enable row level security;
 alter table movies enable row level security;
@@ -258,9 +260,9 @@ insert into cinemas (name, address, district, description, room_count) values
   ('CINEGA Royal Center', '30 Tràng Tiền, Hoàn Kiếm, Hà Nội', 'Hoàn Kiếm', 'Không gian cổ điển hoài cổ.', 4),
   ('CINEGA The Riviera', 'Lầu 3, 36 Nguyễn Hữu Thọ, Q.7, TP.HCM', 'Quận 7', 'Phòng VIP ghế massage.', 5);
 
-with c as (select id from cinemas)
+with c as (select id, name from cinemas)
 insert into rooms (cinema_id, name, "rows", cols)
-select id, name, 10, 13 from c;
+select c.id, c.name, 10, 13 from c;
 
 with r as (select id from rooms)
 insert into seats (room_id, row_label, seat_number, seat_type)
@@ -279,7 +281,6 @@ returns void language sql security definer as $$
   update movies set status = 'NOW_SHOWING' where release_date <= current_date and status = 'COMING_SOON';
   update movies set status = 'COMING_SOON' where release_date > current_date and status = 'NOW_SHOWING';
 $$;
-);
 -- ---------- Tăng lượt xem ----------
 create or replace function public.increase_view(p_path text, p_date date)
 returns void language sql security definer as $$
