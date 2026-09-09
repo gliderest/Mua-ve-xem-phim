@@ -21,7 +21,8 @@ body {
   line-height: 1.65;
   color: var(--text-primary);
   background-color: var(--bg-primary);
-  background-image: var(--radial-glow);
+  background-image: var(--grad-body), var(--radial-glow);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -152,7 +153,12 @@ h4 { font-size: var(--text-xl); }
 
 .section-title em {
   font-style: italic;
-  color: var(--accent);
+  background: var(--grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
@@ -181,36 +187,37 @@ h4 { font-size: var(--text-xl); }
 }
 
 .btn--gold {
-  background: linear-gradient(180deg, var(--accent-strong), var(--accent-soft));
+  background: var(--grad-gold);
   border: 1px solid var(--accent-strong);
-  color: #1a1307;
-  box-shadow: 0 8px 30px -10px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #fff;
+  box-shadow: 0 10px 30px -10px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .btn--gold:hover {
   transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 14px 42px -12px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  box-shadow: 0 16px 44px -12px rgba(232, 98, 12, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn--ghost {
   border-color: var(--border-strong);
   color: var(--text-secondary);
-  background: rgba(43, 31, 21, 0.04);
-  backdrop-filter: blur(6px);
+  background: var(--grad-glass);
+  box-shadow: var(--shadow-soft);
 }
 .btn--ghost:hover {
   border-color: var(--accent);
-  color: var(--accent-strong);
+  color: var(--accent-soft);
   transform: translateY(-2px);
 }
 
 .btn--surface {
-  background: var(--surface-2);
+  background: var(--grad-soft);
   border-color: var(--border);
   color: var(--text-primary);
+  box-shadow: var(--shadow-soft);
 }
 .btn--surface:hover {
   border-color: var(--border-strong);
-  background: var(--surface-3);
+  background: var(--surface-2);
   transform: translateY(-2px);
 }
 
@@ -291,9 +298,10 @@ h4 { font-size: var(--text-xl); }
 /* ---------- Cards (double-bezel) ---------- */
 .card {
   position: relative;
-  background: var(--surface);
+  background: var(--grad-soft);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 

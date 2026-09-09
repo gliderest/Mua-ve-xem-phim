@@ -90,4 +90,13 @@
   --z-modal: 300;
   --z-toast: 400;
   --z-grain: 500;
+  /* ---- Gradient & Shadow tokens (light theme) ---- */
+  --grad-body: linear-gradient(180deg, #fffaf4 0%, #fdf3e7 52%, #f6e9d4 100%);
+  --grad-soft: linear-gradient(165deg, #ffffff 0%, #fff8ee 100%);
+  --grad-gold: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #cf4f00 100%);
+  --grad-dark: linear-gradient(180deg, #2b1f15 0%, #432b16 100%);
+  --grad-glass: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,252,246,0.6));
+  --grad-seat: linear-gradient(150deg, #ff8a3d, #e8620c);
+  --shadow-soft: 0 10px 28px -14px rgba(43, 31, 21, 0.14);
+  --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.25);
 }
