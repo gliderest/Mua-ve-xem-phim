@@ -1,49 +1,49 @@
 /* ============================================================
-   CINEGA — Design Tokens
-   Phong cách: Premium cinematic / editorial film aesthetic
-   Viết tay, không dùng thư viện. Theo mục #28 kiến trúc.
+   CINEGA — Design Tokens (LIGHT THEME — cam/trắng ấm)
+   Phong cách: premium warm light — cinematic nhưng sáng.
+   KHÔNG dùng thư viện — custom thuần.
    ============================================================ */
 
 :root {
-  /* ---- Màu nền (deep OLED black) ---- */
-  --bg-deep: #050507;
-  --bg-primary: #0a0a0d;
-  --bg-secondary: #101014;
-  --surface: #16161c;
-  --surface-2: #1d1d25;
-  --surface-3: #262630;
+  /* ---- Nền (warm light) ---- */
+  --bg-deep: #f3ede1;
+  --bg-primary: #fbf7ef;
+  --bg-secondary: #f5eee2;
+  --surface: #ffffff;
+  --surface-2: #fffaf2;
+  --surface-3: #f1e7d7;
 
-  /* ---- Text (warm white) ---- */
-  --text-primary: #f3eee4;
-  --text-secondary: #cfc8ba;
-  --text-muted: #8f897c;
-  --text-faint: #5c574d;
+  /* ---- Text (espresso ấm) ---- */
+  --text-primary: #2b1f15;
+  --text-secondary: #5b4c3c;
+  --text-muted: #8a7a67;
+  --text-faint: #b8a995;
 
-  /* ---- Accent (cinematic gold) ---- */
-  --accent: #c9a668;
-  --accent-strong: #e6c98a;
-  --accent-soft: #b08d4f;
-  --accent-glow: rgba(201, 166, 104, 0.22);
-  --accent-faint: rgba(201, 166, 104, 0.1);
+  /* ---- Accent (cam) ---- */
+  --accent: #e8620c;
+  --accent-strong: #ff7c26;
+  --accent-soft: #d25200;
+  --accent-glow: rgba(232, 98, 12, 0.18);
+  --accent-faint: rgba(232, 98, 12, 0.09);
 
   /* ---- Trạng thái ---- */
-  --success: #6fbf8f;
-  --danger: #e06c6c;
-  --warning: #d9a05b;
-  --info: #7aa7d8;
+  --success: #2e9e5b;
+  --danger: #d8433f;
+  --warning: #e08e0b;
+  --info: #2f7fd1;
 
   /* ---- Border ---- */
-  --border: rgba(243, 238, 228, 0.09);
-  --border-strong: rgba(243, 238, 228, 0.16);
-  --border-accent: rgba(201, 166, 104, 0.45);
+  --border: rgba(43, 31, 21, 0.10);
+  --border-strong: rgba(43, 31, 21, 0.18);
+  --border-accent: rgba(232, 98, 12, 0.45);
 
-  /* ---- Radial texture ---- */
-  --radial-glow: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(201, 166, 104, 0.09), transparent 60%);
-  --radial-hero: radial-gradient(ellipse 70% 60% at 50% 108%, rgba(201, 166, 104, 0.14), transparent 55%);
+  /* ---- Texture ---- */
+  --radial-glow: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(232, 98, 12, 0.10), transparent 60%);
+  --radial-hero: radial-gradient(ellipse 70% 60% at 50% 108%, rgba(232, 98, 12, 0.14), transparent 55%);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 
   /* ---- Typography ---- */
-  --font-display: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+  --font-display: "Cormorant Garamond", "Georgia", serif;
   --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
 
   --text-xs: 0.72rem;
@@ -57,7 +57,6 @@
   --text-5xl: 4.6rem;
   --text-hero: clamp(3.2rem, 9vw, 8rem);
 
-  /* ---- Spacing ---- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.85rem;
@@ -69,7 +68,6 @@
 
   --section-pad: clamp(4rem, 8vw, 7rem);
 
-  /* ---- Radius ---- */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -77,7 +75,6 @@
   --radius-xl: 38px;
   --radius-pill: 999px;
 
-  /* ---- Độ dài chuyển động ---- */
   --duration-fast: 0.18s;
   --duration-normal: 0.32s;
   --duration-slow: 0.6s;
@@ -87,7 +84,6 @@
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-cinema: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* ---- Layout ---- */
   --container: 1280px;
   --nav-height: 76px;
   --z-nav: 100;
