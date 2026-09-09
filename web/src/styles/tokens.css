@@ -97,3 +97,45 @@
   --z-toast: 400;
   --z-grain: 500;
 }
+
+/* ============================================================
+   LIGHT THEME — bật bằng <html data-theme="light">
+   ============================================================ */
+:root[data-theme='light'] {
+  --bg-deep: #f3ede1;
+  --bg-primary: #fbf7ef;
+  --bg-secondary: #f5eee2;
+  --surface: #ffffff;
+  --surface-2: #fffaf2;
+  --surface-3: #f1e7d7;
+
+  --text-primary: #2b1f15;
+  --text-secondary: #5b4c3c;
+  --text-muted: #8a7a67;
+  --text-faint: #b8a995;
+
+  --accent: #e8620c;
+  --accent-strong: #ff7c26;
+  --accent-soft: #d25200;
+  --accent-glow: rgba(232, 98, 12, 0.18);
+  --accent-faint: rgba(232, 98, 12, 0.09);
+
+  --success: #2e9e5b;
+  --danger: #d8433f;
+  --warning: #e08e0b;
+  --info: #2f7fd1;
+
+  --border: rgba(43, 31, 21, 0.10);
+  --border-strong: rgba(43, 31, 21, 0.18);
+  --border-accent: rgba(232, 98, 12, 0.45);
+
+  --radial-glow: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(232, 98, 12, 0.10), transparent 60%);
+  --radial-hero: radial-gradient(ellipse 70% 60% at 50% 108%, rgba(232, 98, 12, 0.14), transparent 55%);
+
+  --grad-body: linear-gradient(180deg, #fffaf4 0%, #fdf3e7 52%, #f6e9d4 100%);
+  --grad-soft: linear-gradient(165deg, #ffffff 0%, #fff8ee 100%);
+  --grad-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 242, 0.72));
+
+  --shadow-soft: 0 10px 28px -14px rgba(43, 31, 21, 0.16);
+  --shadow-card: 0 18px 44px -26px rgba(232, 98, 12, 0.28);
+}

@@ -29,6 +29,8 @@ services:
         value: https://cinega.onrender.com
       - key: TMDB_API_KEY
         sync: false
+      - key: VITE_TMDB_API_KEY
+        value: 13a6c132b1b02cf2a8c2a66d939c6928
       - key: SEPAY_API_KEY
         sync: false
       - key: SEPAY_WEBHOOK_SECRET

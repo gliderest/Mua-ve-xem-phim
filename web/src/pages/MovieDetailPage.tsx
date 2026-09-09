@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { movieService, cinemaService } from '@/services/api'
-import { PosterOrArt } from '@/components/common/MovieCard'
+import { tmdbService } from '@/services/tmdb'
+import { PosterArt } from '@/components/svg/PosterArt'
 import { IconArrowLeft, IconClock, IconPlay, IconCalendar } from '@/components/svg/Icons'
 import { formatVND } from '@/data/mock'
 import type { Cinema, Showtime } from '@/types'
@@ -15,6 +16,20 @@ export function MovieDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10))
+  const [video, setVideo] = useState<{ youtubeKey: string; type: string } | null>(null)
+
+  // Lấy trailer YouTube từ TMDB khi có tmdbId
+  useEffect(() => {
+    if (!movie?.tmdbId) return
+    let alive = true
+    tmdbService
+      .videos(movie.tmdbId)
+      .then((v) => alive && setVideo(v))
+      .catch(() => alive && setVideo(null))
+    return () => {
+      alive = false
+    }
+  }, [movie?.tmdbId])
 
   useEffect(() => {
     if (!id) return
@@ -93,28 +108,47 @@ export function MovieDetailPage() {
 
   return (
     <>
-      <section className="detail-hero">
-        <div className="container detail-hero__grid">
-          <div className="detail-hero__poster" style={{ position: 'relative' }}>
-            <PosterOrArt movie={movie} />
-            <span className="badge badge--gold" style={{ position: 'absolute', top: 12, left: 12 }}>
-              {movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}
-            </span>
+      <section
+        className="detail-hero detail-hero--full"
+        style={
+          movie.backdropUrl
+            ? { backgroundImage: `linear-gradient(90deg, rgba(10,8,6,0.92) 0%, rgba(10,8,6,0.6) 45%, rgba(10,8,6,0.25) 100%), url(${movie.backdropUrl})` }
+            : undefined
+        }
+      >
+        <div className="container detail-hero__inner">
+          <span className="badge badge--gold">
+            {movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}
+          </span>
+          <h1 className="detail-info__title">{movie.title}</h1>
+          {movie.originalTitle && (
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)' }}>
+              {movie.originalTitle}
+            </p>
+          )}
+          <div className="detail-info__sub">
+            <span>{movie.genre.join(' · ')}</span>
+            {movie.rated && <span>{movie.rated}</span>}
+            {movie.language && <span>{movie.language}</span>}
+            <span>{movie.durationMinutes} phút</span>
           </div>
-          <div className="detail-info">
-            <h1 className="detail-info__title">{movie.title}</h1>
-            {movie.originalTitle && (
-              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)' }}>
-                {movie.originalTitle}
-              </p>
+          <div className="detail-info__actions">
+            {movie.status === 'NOW_SHOWING' && (
+              <a href="#showtimes" className="btn btn--gold btn--lg">
+                <IconPlay size={20} /> Đặt vé ngay
+              </a>
             )}
-            <div className="detail-info__sub">
-              <span>{movie.genre.join(' · ')}</span>
-              <span>{movie.rated}</span>
-              <span>{movie.language}</span>
-            </div>
-            <p className="detail-info__desc">{movie.description}</p>
+            <Link to="/movies" className="btn btn--ghost btn--lg">
+              <IconArrowLeft size={18} /> Xem phim khác
+            </Link>
+          </div>
+        </div>
+      </section>
 
+      <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
+        <div className="container detail-layout">
+          <div className="detail-info">
+            <p className="detail-info__desc detail-info__desc--full">{movie.description}</p>
             <dl className="detail-info__meta">
               {movie.director && (
                 <div className="detail-info__meta-item">
@@ -143,17 +177,23 @@ export function MovieDetailPage() {
                 </div>
               )}
             </dl>
+          </div>
 
-            <div className="detail-info__actions">
-              {movie.status === 'NOW_SHOWING' && (
-                <a href="#showtimes" className="btn btn--gold btn--lg">
-                  <IconPlay size={20} /> Đặt vé ngay
-                </a>
-              )}
-              <Link to="/movies" className="btn btn--ghost btn--lg">
-                <IconArrowLeft size={18} /> Xem phim khác
-              </Link>
-            </div>
+          <div className="detail-trailer">
+            {video ? (
+              <iframe
+                className="detail-trailer__frame"
+                src={`https://www.youtube-nocookie.com/embed/${video.youtubeKey}`}
+                title="Trailer phim"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <div className="detail-trailer__fallback">
+                <PosterArt movie={movie} />
+                <p className="detail-trailer__note">Chưa có trailer từ TMDB cho phim này.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
