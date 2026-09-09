@@ -11,7 +11,7 @@ const IMG = (import.meta.env.VITE_TMDB_IMAGE_BASE as string) || 'https://image.t
 const KEY = import.meta.env.VITE_TMDB_API_KEY as string
 const TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN as string
 
-const hasKey = (): boolean => KEY.length > 0 && KEY !== 'CHANGE_ME_YOUR_TMDB_API_KEY'
+const hasKey = (): boolean => !!KEY && KEY.length > 0 && KEY !== 'CHANGE_ME_YOUR_TMDB_API_KEY'
 
 interface TGenre {
   id: number
