@@ -146,6 +146,19 @@ export const IconChat = (p: IconProps) => (
   </svg>
 )
 
+export const IconSun = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="4.2" />
+    <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4l1.4-1.4M18 6l1.4-1.4" />
+  </svg>
+)
+
+export const IconMoon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M20 13.5A8 8 0 0 1 10.5 4 7.5 7.5 0 1 0 20 13.5z" />
+  </svg>
+)
+
 export const IconEdit = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M4 20l4.5-1 10-10-3.5-3.5-10 10zM18.5 5.5l-3.5-3.5M8.5 19H20" />

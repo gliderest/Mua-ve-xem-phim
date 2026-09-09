@@ -3,6 +3,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { BrandText, LogoMark } from '@/components/svg/Brand'
 import { IconClose, IconMenu, IconTicket, IconUser } from '@/components/svg/Icons'
 import { useAuth } from '@/context/AuthContext'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
 
 const LINKS = [
   { to: '/', label: 'Trang chủ' },
@@ -51,6 +52,7 @@ export function Navbar() {
           </nav>
 
           <div className="nav__actions">
+            <ThemeToggle />
             {user ? (
               <>
                 <Link to="/my-tickets" className="btn btn--ghost btn--sm">

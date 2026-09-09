@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { movieService } from '@/services/api'
+import { useReveal } from '@/lib/gsap'
+import { useRef } from 'react'
 import { MovieRow } from '@/components/common/MovieRow'
 import { IconSearch } from '@/components/svg/Icons'
 import type { Movie } from '@/types'
@@ -15,6 +17,8 @@ export function MoviesPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['key']>('ALL')
   const [query, setQuery] = useState('')
+  const listRef = useRef<HTMLDivElement>(null)
+  useReveal(listRef, [movies, loading])
 
   useEffect(() => {
     movieService.list().then(setMovies).finally(() => setLoading(false))
@@ -29,7 +33,7 @@ export function MoviesPage() {
 
   return (
     <>
-      <section className="section section--page">
+      <section className="section section--page page-hero--dark">
         <div className="container">
           <span className="eyebrow">Thư viện phim</span>
           <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
@@ -62,6 +66,18 @@ export function MoviesPage() {
               </div>
             </div>
           </div>
+
+          <div className="page-hero__fx" aria-hidden="true">
+            <span className="page-hero__float page-hero__float--1" />
+            <span className="page-hero__float page-hero__float--2" />
+            <span className="page-hero__float page-hero__float--3" />
+            <div className="page-hero__ticker">
+              <div className="page-hero__ticker-track">
+                <span>★ CINEGA</span><span>✦ ĐANG CHIẾU</span><span>★ NOW SHOWING</span><span>✦ SẮP CHIẾU</span><span>★ COMING SOON</span>
+                <span>★ CINEGA</span><span>✦ ĐANG CHIẾU</span><span>★ NOW SHOWING</span><span>✦ SẮP CHIẾU</span><span>★ COMING SOON</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -79,7 +95,7 @@ export function MoviesPage() {
               <p>Không tìm thấy phim phù hợp với bộ lọc của bạn.</p>
             </div>
           ) : (
-            <div className="movie-list">
+            <div className="movie-list" ref={listRef}>
               {filtered.map((m) => (
                 <MovieRow key={m.id} movie={m} />
               ))}

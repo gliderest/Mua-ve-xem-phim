@@ -99,3 +99,9 @@
   .stat-grid { grid-template-columns: 1fr; }
   .summary-total { flex-direction: column; gap: var(--space-1); }
 }
+/* MovieDetail mobile: về 1 cột */
+@media (max-width: 799px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .detail-hero--full { min-height: 52vh; align-items: flex-end; }
+  .detail-hero--full .detail-info__title { font-size: clamp(2rem, 9vw, 2.8rem); }
+}

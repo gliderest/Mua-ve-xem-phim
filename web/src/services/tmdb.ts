@@ -106,8 +106,36 @@ interface TReviewsResponse {
   results: TReview[]
 }
 
+interface TVideo {
+  key: string
+  site: string
+  type: string
+}
+
+interface TVideosResponse {
+  results: TVideo[]
+}
+
+/** Lấy YouTube trailer/key từ TMDB */
+async function videos(tmdbId: number): Promise<{ youtubeKey: string; type: string } | null> {
+  const data = await fetchJson<TVideosResponse>(
+    `/movie/${tmdbId}/videos?language=vi-VN`,
+  )
+  const yt = (data.results ?? []).find(
+    (v) => v.site === 'YouTube' && v.type === 'Trailer',
+  )
+    ?? (data.results ?? []).find((v) => v.site === 'YouTube')
+  if (!yt) return null
+  return { youtubeKey: yt.key, type: yt.type }
+}
+
 export const tmdbService = {
   enabled: hasKey(),
+
+  /** Lấy trailer YouTube từ TMDB */
+  async videos(tmdbId: number): Promise<{ youtubeKey: string; type: string } | null> {
+    return videos(tmdbId)
+  },
 
   /** Phim đang chiếu tại Việt Nam — /movie/now_playing với region=VN */
   async nowPlayingVN(limit = 12): Promise<Movie[]> {
