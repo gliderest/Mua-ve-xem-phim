@@ -85,12 +85,47 @@ function showtimesForTmd(movieId: string): Showtime[] {
   return out
 }
 
+/** Storage key cho showtimes admin đã tạo/sửa */
+const STORAGE_KEY = 'cinera_showtimes'
+
+/** Đọc showtimes đã lưu từ localStorage */
+function loadSavedShowtimes(): Showtime[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+/** Ghi showtimes admin vào localStorage */
+function saveShowtimes(list: Showtime[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+}
+
+/** Merge: deterministic default + admin-created (admin override default cùng movieId+date+time) */
+function mergedShowtimes(movieId: string): Showtime[] {
+  const defaults = showtimesForTmd(movieId)
+  const saved = loadSavedShowtimes().filter((s) => s.movieId === movieId)
+  if (saved.length === 0) return defaults
+
+  // Admin-saved thay thế default nếu cùng date+time+roomId
+  const key = (s: Showtime) => `${s.date}-${s.startTime}-${s.roomId}`
+  const savedKeys = new Set(saved.map(key))
+  const filteredDefaults = defaults.filter((d) => !savedKeys.has(key(d)))
+  return [...filteredDefaults, ...saved]
+}
+
 /** Tra cứu suất chiếu (data hệ thống CINÉRA) */
 export const showtimeService = {
   async byId(id: string): Promise<Showtime> {
+    // Tìm trong cache + saved
     let st = tmdShowtimeCache.find((s) => s.id === id)
     if (!st) {
-      // Mở thẳng URL booking nhưng cache chưa có → tự sinh từ id
+      const saved = loadSavedShowtimes().find((s) => s.id === id)
+      if (saved) { st = saved }
+    }
+    if (!st) {
       const parsed = parseTmdShowtimeId(id)
       if (parsed) {
         showtimesForTmd(parsed.movieId)
@@ -100,6 +135,53 @@ export const showtimeService = {
     if (!st) fail('Suất chiếu không tồn tại.', 'SHOWTIME_NOT_FOUND')
     return clone(st!)
   },
+
+  /** Lấy danh sách suất chiếu cho 1 phim (merged default + admin) */
+  async byMovie(movieId: string): Promise<Showtime[]> {
+    return clone(mergedShowtimes(movieId))
+  },
+
+  /** Thêm suất chiếu mới từ admin */
+  async add(showtime: Omit<Showtime, 'id'>): Promise<Showtime> {
+    const id = `st-a-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+    const newSt: Showtime = { ...showtime, id }
+    const saved = loadSavedShowtimes()
+    saved.push(newSt)
+    saveShowtimes(saved)
+    return clone(newSt)
+  },
+
+  /** Sửa suất chiếu */
+  async update(id: string, patch: Partial<Omit<Showtime, 'id'>>): Promise<Showtime> {
+    const saved = loadSavedShowtimes()
+    const idx = saved.findIndex((s) => s.id === id)
+    if (idx < 0) fail('Suất chiếu không tồn tại để sửa.', 'SHOWTIME_NOT_FOUND')
+    saved[idx] = { ...saved[idx], ...patch }
+    saveShowtimes(saved)
+    return clone(saved[idx])
+  },
+
+  /** Xóa suất chiếu */
+  async delete(id: string): Promise<void> {
+    const saved = loadSavedShowtimes()
+    saveShowtimes(saved.filter((s) => s.id !== id))
+  },
+
+  /** Lấy tất cả showtimes (admin xem tổng quan) */
+  async all(): Promise<Showtime[]> {
+    const allIds = new Set<string>()
+    const out: Showtime[] = []
+    // Lấy saved trước
+    for (const s of loadSavedShowtimes()) { allIds.add(s.id); out.push(s) }
+    // Thêm defaults từ cache
+    for (const s of tmdShowtimeCache) { if (!allIds.has(s.id)) { allIds.add(s.id); out.push(s) } }
+    return clone(out)
+  },
+}
+
+/** Xóa cache khi update (để mergedShowtimes refill) */
+export function clearShowtimeCache() {
+  tmdShowtimeCache.length = 0
 }
 
 /* ============================================================

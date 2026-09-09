@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { movieService } from '@/services/api'
-import { MovieCard } from '@/components/common/MovieCard'
+import { MovieRow } from '@/components/common/MovieRow'
 import { IconSearch } from '@/components/svg/Icons'
 import type { Movie } from '@/types'
 
@@ -68,9 +68,9 @@ export function MoviesPage() {
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
           {loading ? (
-            <div className="loading-shimmer-grid">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="skeleton" />
+            <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="skeleton" style={{ height: 96 }} />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -79,9 +79,9 @@ export function MoviesPage() {
               <p>Không tìm thấy phim phù hợp với bộ lọc của bạn.</p>
             </div>
           ) : (
-            <div className="movies-grid">
+            <div className="movie-list">
               {filtered.map((m) => (
-                <MovieCard key={m.id} movie={m} />
+                <MovieRow key={m.id} movie={m} />
               ))}
             </div>
           )}

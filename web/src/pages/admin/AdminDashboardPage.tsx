@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
-import { movieService } from '@/services/api'
-import { MOCK_CONTACT_MESSAGES } from '@/data/mock'
-import { IconEdit, IconTrash, IconChat, IconUser, IconTicket, IconEye } from '@/components/svg/Icons'
-import type { AdminStats, Comment, ContactMessage, Movie } from '@/types'
+import { cinemaService, movieService, showtimeService } from '@/services/api'
+import { MOCK_CONTACT_MESSAGES, MOCK_ROOMS, formatVND } from '@/data/mock'
+import { IconEdit, IconTrash, IconChat, IconUser, IconTicket, IconEye, IconClock } from '@/components/svg/Icons'
+import type { AdminStats, Cinema, Comment, ContactMessage, Movie, Showtime } from '@/types'
 
 /* ============================================================
    Admin Dashboard — giao diện tự thiết kế, không template.
@@ -32,6 +32,9 @@ export function AdminDashboardPage() {
             <NavLink to="/admin/comments" className={({ isActive }) => (isActive ? 'is-active' : '')}>
               <IconChat size={18} /> Bình luận
             </NavLink>
+            <NavLink to="/admin/showtimes" className={({ isActive }) => (isActive ? 'is-active' : '')}>
+              <IconClock size={18} /> Suất chiếu
+            </NavLink>
             <NavLink to="/admin/contact" className={({ isActive }) => (isActive ? 'is-active' : '')}>
               <IconUser size={18} /> Liên hệ
             </NavLink>
@@ -42,6 +45,7 @@ export function AdminDashboardPage() {
               <Route index element={<AdminStats />} />
               <Route path="movies" element={<AdminMovies />} />
               <Route path="comments" element={<AdminComments />} />
+              <Route path="showtimes" element={<AdminShowtimes />} />
               <Route path="contact" element={<AdminContact />} />
             </Routes>
           </div>
@@ -272,6 +276,292 @@ function AdminComments() {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function AdminShowtimes() {
+  const [movies, setMovies] = useState<Movie[]>([])
+  const [cinemas, setCinemas] = useState<Cinema[]>([])
+  const [times, setTimes] = useState<Showtime[]>([])
+  const [loading, setLoading] = useState(true)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+
+  const [fMovie, setFMovie] = useState('')
+  const [fCinema, setFCinema] = useState('')
+  const [fRoom, setFRoom] = useState('')
+  const [fDate, setFDate] = useState(new Date().toISOString().slice(0, 10))
+  const [fTime, setFTime] = useState('19:30')
+  const [fStd, setFStd] = useState('90000')
+  const [fVip, setFVip] = useState('120000')
+
+  const loadAll = async () => {
+    const [m, c] = await Promise.all([movieService.list(), cinemaService.list()])
+    setMovies(m)
+    setCinemas(c)
+    // Nạp suất chiếu mặc định cho phim đang chiếu (để bảng có dữ liệu sẵn)
+    for (const mov of m.filter((x) => x.status === 'NOW_SHOWING').slice(0, 12)) {
+      await showtimeService.byMovie(mov.id)
+    }
+    const t = await showtimeService.all()
+    setTimes(t)
+  }
+
+  useEffect(() => {
+    loadAll().finally(() => setLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const rooms = MOCK_ROOMS.filter((r) => r.cinemaId === fCinema)
+  const titleOf = (id: string) => movies.find((m) => m.id === id)?.title ?? id
+  const cinemaOf = (id: string) => cinemas.find((c) => c.id === id)?.name ?? id
+  const roomOf = (id: string) => MOCK_ROOMS.find((r) => r.id === id)?.name ?? id
+
+  const flash = (msg: string) => {
+    setNotice(msg)
+    setTimeout(() => setNotice(null), 3500)
+  }
+
+  const resetForm = () => {
+    setEditingId(null)
+    setFMovie('')
+    setFCinema('')
+    setFRoom('')
+    setFDate(new Date().toISOString().slice(0, 10))
+    setFTime('19:30')
+    setFStd('90000')
+    setFVip('120000')
+  }
+
+  const startEdit = (st: Showtime) => {
+    setEditingId(st.id)
+    setFMovie(st.movieId)
+    setFCinema(st.cinemaId)
+    setFRoom(st.roomId)
+    setFDate(st.date)
+    setFTime(new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
+    setFStd(String(st.priceStandard))
+    setFVip(String(st.priceVip))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!fMovie || !fCinema || !fRoom || !fDate || !fTime) {
+      flash('Vui lòng điền đầy đủ: phim, rạp, phòng, ngày, giờ.')
+      return
+    }
+    setBusy(true)
+    try {
+      const start = new Date(`${fDate}T${fTime}:00`)
+      const dur = movies.find((m) => m.id === fMovie)?.durationMinutes || 118
+      const end = new Date(start)
+      end.setMinutes(end.getMinutes() + dur)
+      const payload = {
+        movieId: fMovie,
+        cinemaId: fCinema,
+        roomId: fRoom,
+        date: fDate,
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+        priceStandard: Number(fStd) || 90000,
+        priceVip: Number(fVip) || 120000,
+      }
+      if (editingId) {
+        await showtimeService.update(editingId, payload)
+        flash('Đã cập nhật suất chiếu.')
+      } else {
+        await showtimeService.add(payload)
+        flash('Đã thêm suất chiếu mới.')
+      }
+      await loadAll()
+      resetForm()
+    } catch (err) {
+      flash((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const remove = async (id: string) => {
+    await showtimeService.delete(id)
+    await loadAll()
+    setConfirmDelete(null)
+    flash('Đã xóa suất chiếu.')
+  }
+
+  const sorted = times.slice().sort((a, b) => a.startTime.localeCompare(b.startTime))
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <h2>Quản lý suất chiếu</h2>
+        <span className="badge">{times.length} suất hiện có</span>
+      </div>
+      {notice && <div className="alert alert--info" style={{ marginBottom: 'var(--space-4)' }}>{notice}</div>}
+<form className="card" onSubmit={submit} style={{ padding: 'var(--space-5)', marginBottom: 'var(--space-5)' }}>
+        <h3 style={{ marginBottom: 'var(--space-4)' }}>
+          {editingId ? `Sửa suất chiếu ${editingId.slice(-6)}` : 'Thêm suất chiếu mới'}
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 'var(--space-3)' }}>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-movie">Phim *</label>
+            <select id="as-movie" value={fMovie} onChange={(e) => { setFMovie(e.target.value); setFRoom('') }}>
+              <option value="">— Chọn phim —</option>
+              {movies.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.title} ({m.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-cinema">Rạp *</label>
+            <select id="as-cinema" value={fCinema} onChange={(e) => { setFCinema(e.target.value); setFRoom('') }}>
+              <option value="">— Chọn rạp —</option>
+              {cinemas.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-room">Phòng *</label>
+            <select id="as-room" value={fRoom} onChange={(e) => setFRoom(e.target.value)} disabled={!fCinema}>
+              <option value="">— Chọn phòng —</option>
+              {rooms.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-date">Ngày *</label>
+            <input id="as-date" type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-time">Giờ *</label>
+            <input id="as-time" type="time" value={fTime} onChange={(e) => setFTime(e.target.value)} />
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-std">Giá thường (VNĐ)</label>
+            <input id="as-std" type="number" min={10000} step={5000} value={fStd} onChange={(e) => setFStd(e.target.value)} />
+          </div>
+          <div className="field" style={{ marginBottom: 0 }}>
+            <label htmlFor="as-vip">Giá VIP (VNĐ)</label>
+            <input id="as-vip" type="number" min={10000} step={5000} value={fVip} onChange={(e) => setFVip(e.target.value)} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <button type="submit" className="btn btn--gold" disabled={busy}>
+            {busy ? 'Đang lưu...' : editingId ? 'Lưu thay đổi' : 'Thêm suất chiếu'}
+          </button>
+          {editingId && (
+            <button type="button" className="btn btn--ghost" onClick={resetForm}>
+              Hủy sửa
+            </button>
+          )}
+        </div>
+      </form>
+
+      <ShowtimesTable
+        loading={loading}
+        sorted={sorted}
+        titleOf={titleOf}
+        cinemaOf={cinemaOf}
+        roomOf={roomOf}
+        confirmDelete={confirmDelete}
+        onEdit={startEdit}
+        onConfirm={setConfirmDelete}
+        onDelete={remove}
+      />
+    </div>
+  )
+}
+
+function ShowtimesTable(props: {
+  loading: boolean
+  sorted: Showtime[]
+  titleOf: (id: string) => string
+  cinemaOf: (id: string) => string
+  roomOf: (id: string) => string
+  confirmDelete: string | null
+  onEdit: (st: Showtime) => void
+  onConfirm: (id: string) => void
+  onDelete: (id: string) => void
+}) {
+  const { loading, sorted, titleOf, cinemaOf, roomOf, confirmDelete, onEdit, onConfirm, onDelete } = props
+  return (
+    <div className="admin-table-wrap">
+      <table className="admin-table">
+        <thead>
+          <tr>
+            <th>Phim</th>
+            <th>Rạp / Phòng</th>
+            <th>Ngày</th>
+            <th>Giờ chiếu</th>
+            <th>Giá</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <tr key={i}>
+                  <td><div className="skeleton" style={{ height: 20 }} /></td>
+                  <td><div className="skeleton" style={{ height: 20 }} /></td>
+                  <td><div className="skeleton" style={{ height: 20 }} /></td>
+                  <td><div className="skeleton" style={{ height: 20 }} /></td>
+                  <td><div className="skeleton" style={{ height: 20 }} /></td>
+                  <td />
+                </tr>
+              ))
+            : sorted.length === 0
+              ? (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="state-empty">Chưa có suất chiếu nào. Thêm suất đầu tiên bằng form bên trên.</div>
+                    </td>
+                  </tr>
+                )
+              : sorted.map((st) => (
+                  <tr key={st.id}>
+                    <td><strong>{titleOf(st.movieId)}</strong></td>
+                    <td>
+                      {cinemaOf(st.cinemaId)}
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>{roomOf(st.roomId)}</div>
+                    </td>
+                    <td>{new Date(st.date + 'T00:00:00').toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}</td>
+                    <td>
+                      <span className="badge badge--gold">
+                        {new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </td>
+                    <td>
+                      {formatVND(st.priceStandard)}
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>VIP {formatVND(st.priceVip)}</div>
+                    </td>
+                    <td>
+                      <div className="row-actions">
+                        <button className="icon-btn" aria-label={`Sửa suất ${titleOf(st.movieId)}`} onClick={() => onEdit(st)}>
+                          <IconEdit size={18} />
+                        </button>
+                        {confirmDelete === st.id ? (
+                          <button className="btn btn--danger btn--sm" onClick={() => onDelete(st.id)}>
+                            Chắc chắn?
+                          </button>
+                        ) : (
+                          <button className="icon-btn icon-btn--del" aria-label={`Xóa suất ${titleOf(st.movieId)}`} onClick={() => onConfirm(st.id)}>
+                            <IconTrash size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+        </tbody>
+      </table>
     </div>
   )
 }

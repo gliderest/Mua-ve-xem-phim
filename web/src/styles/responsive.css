@@ -45,6 +45,19 @@
   .movie-card__body { padding: var(--space-3); }
   .movie-card__title { font-size: var(--text-lg); }
 
+  /* Movie list mobile */
+  .movie-row {
+    grid-template-columns: 56px 1fr;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+  .movie-row__poster { width: 56px; }
+  .movie-row__times {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    max-width: none;
+  }
+
   .section-head { align-items: flex-start; flex-direction: column; }
   .section--page { padding-block: var(--space-5); }
 
