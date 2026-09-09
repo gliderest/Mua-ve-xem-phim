@@ -1770,3 +1770,31 @@
 .detail-trailer {
   border-color: var(--border-accent);
 }
+
+/* ---------- Feather: Home hero + header Phim ---------- */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(72px, 9vw, 140px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+.page-hero--dark {
+  position: relative;
+  overflow: hidden;
+}
+.page-hero--dark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(56px, 7vw, 110px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+  pointer-events: none;
+  z-index: 1;
+}

@@ -13,10 +13,10 @@
   --surface-3: #36363f;
 
   /* ---- Text (warm white) ---- */
-  --text-primary: #f4efe6;
-  --text-secondary: #cfc8ba;
-  --text-muted: #8f897c;
-  --text-faint: #5d574e;
+  --text-primary: #f7f2e8;
+  --text-secondary: #d9d2c4;
+  --text-muted: #a49c8d;
+  --text-faint: #76705f;
 
   /* ---- Accent (cam nóng) ---- */
   --accent: #e8620c;
@@ -109,10 +109,10 @@
   --surface-2: #fffaf2;
   --surface-3: #f1e7d7;
 
-  --text-primary: #2b1f15;
-  --text-secondary: #5b4c3c;
-  --text-muted: #8a7a67;
-  --text-faint: #b8a995;
+  --text-primary: #241a10;
+  --text-secondary: #4f4338;
+  --text-muted: #6f5f4e;
+  --text-faint: #8f7f6c;
 
   --accent: #e8620c;
   --accent-strong: #ff7c26;
