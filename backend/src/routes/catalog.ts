@@ -110,24 +110,62 @@ catalogRouter.get('/cinemas/:id', async (req: Request, res, next) => {
   } catch (e) { next(e) }
 })
 
-/* ---------------- Showtimes của rạp (user chọn rạp trước khi xem phim) ---------------- */
+/* ---------------- Showtimes của rạp — mặc định mọi phim đang chiếu đều có suất ---------------- */
 catalogRouter.get('/cinemas/:id/showtimes', async (req: Request, res, next) => {
   try {
-    const date = req.query.date as string | undefined
-    let query = supabaseAdmin
+    const cinemaId = req.params.id
+    const date = (req.query.date as string) || new Date().toISOString().slice(0, 10)
+
+    // 1. Lấy suất chiếu thực có trong DB cho rạp + ngày này
+    const { data: existing, error: stErr } = await supabaseAdmin
       .from('showtimes')
-      .select('*, movie:movies(id, title, slug, poster_url, status, duration_minutes, genre)')
-      .eq('cinema_id', req.params.id)
+      .select('*, movie:movies(id, title, poster_url, status, duration_minutes, genre)')
+      .eq('cinema_id', cinemaId)
+      .eq('date', date)
       .order('start_time', { ascending: true })
-    if (date) {
-      query = query.eq('date', date)
-    } else {
-      // Mặc định: lấy suất từ hôm nay trở đi
-      query = query.gte('date', new Date().toISOString().slice(0, 10))
+    if (stErr) throw stErr
+
+    // 2. Lấy tất cả phim đang chiếu
+    const { data: nowMovies, error: mvErr } = await supabaseAdmin
+      .from('movies').select('id, title, poster_url, status, duration_minutes, genre')
+      .eq('status', 'NOW_SHOWING')
+    if (mvErr) throw mvErr
+
+    // 3. Lấy 1 phòng của rạp này (dùng phòng đầu tiên tìm được)
+    const { data: rooms } = await supabaseAdmin
+      .from('rooms').select('id').eq('cinema_id', cinemaId).limit(1)
+    const fallbackRoomId = rooms?.[0]?.id ?? null
+
+    // 4. Tạo suất mặc định cho phim chưa có suất tại rạp này
+    const EXISTING_MOVIE_IDS = new Set((existing ?? []).map((s: any) => s.movie_id))
+    const DEFAULT_TIMES = ['10:00', '13:30', '17:00', '20:30'] // 4 suất/ngày/phim
+    const synthetic: any[] = []
+
+    for (const mv of nowMovies ?? []) {
+      if (EXISTING_MOVIE_IDS.has(mv.id)) continue
+      for (const t of DEFAULT_TIMES) {
+        synthetic.push({
+          id: `syn-${cinemaId}-${mv.id}-${date}-${t}`, // pseudo-id
+          movie_id: mv.id,
+          cinema_id: cinemaId,
+          room_id: fallbackRoomId,
+          date,
+          start_time: `${date}T${t}:00`,
+          end_time: `${date}T${t}:00`,
+          price_standard: 90000,
+          price_vip: 120000,
+          movie: mv,
+          _synthetic: true, // đánh dấu suất tự tạo
+        })
+      }
     }
-    const { data, error } = await query
-    if (error) throw error
-    ok(res, data ?? [])
+
+    // 5. Merge: suất thật + suất mặc định, sắp xếp theo giờ
+    const all = [...(existing ?? []), ...synthetic].sort((a: any, b: any) =>
+      (a.start_time ?? '').localeCompare(b.start_time ?? ''),
+    )
+
+    ok(res, all)
   } catch (e) { next(e) }
 })
 
