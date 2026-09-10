@@ -27,7 +27,7 @@ app.use(
         imgSrc: ["'self'", 'data:', 'blob:', 'https://image.tmdb.org'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-        scriptSrc: ["'self'", "'sha256-92ce0ytfpWONeneE6it5pRQz960emffWzLES4JQPovA='"],
+        scriptSrc: ["'self'", "'sha256-92ce0ytfpWONeneE6it5pRQz960emffWzLES4JQPovA='", 'https://www.youtube.com', 'https://s.ytimg.com'],
         objectSrc: ["'none'"],
         frameAncestors: ["'self'"],
       },
