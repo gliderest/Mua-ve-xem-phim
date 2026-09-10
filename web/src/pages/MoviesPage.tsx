@@ -173,7 +173,7 @@ function MovieRowWithShowtimes({ movie, showtimes }: { movie: Movie; showtimes: 
   return (
     <Link to={`/movies/${movie.id}`} className="movie-row">
       <div className="movie-row__poster">
-        {movie.posterUrl ? <img src={movie.posterUrl} alt={'Poster phim ' + movie.title} loading="lazy" /> : <div className="movie-row__poster-art" />}
+        {movie.posterUrl ? <img src={movie.posterUrl} alt={'Poster phim ' + movie.title} loading="eager" /> : <div className="movie-row__poster-art" />}
         {movie.status === 'NOW_SHOWING' && <span className="movie-row__badge">Đang chiếu</span>}
       </div>
       <div className="movie-row__info">
