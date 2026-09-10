@@ -271,6 +271,33 @@ export const showtimeService = {
   async byMovie(movieId: string): Promise<Showtime[]> {
     return movieService.showtimes(movieId)
   },
+  /** Suất chiếu theo rạp — dùng cho trang Phim (user chọn rạp trước) */
+  async byCinema(cinemaId: string, date?: string): Promise<Array<Showtime & { movie?: Movie }>> {
+    const qs = date ? `?date=${date}` : ''
+    const rows = await http<Array<RowShowtime & { movie?: any }>>(`/cinemas/${cinemaId}/showtimes${qs}`)
+    return (rows ?? []).map((r) => ({
+      ...mapShowtime(r),
+      movie: r.movie ? {
+        id: r.movie.id,
+        title: r.movie.title,
+        slug: r.movie.slug ?? '',
+        description: '',
+        durationMinutes: r.movie.duration_minutes ?? 120,
+        genre: r.movie.genre ?? [],
+        director: '',
+        cast: [],
+        releaseDate: '',
+        language: '',
+        rated: '',
+        status: (r.movie.status ?? 'NOW_SHOWING') as Movie['status'],
+        hue: 30,
+        artIndex: 0,
+        rating: 0,
+        reviewCount: 0,
+        posterUrl: r.movie.poster_url ?? undefined,
+      } : undefined,
+    }))
+  },
   async all(): Promise<Showtime[]> {
     const rows = await http<RowShowtime[]>('/admin/showtimes')
     return (rows ?? []).map(mapShowtime)

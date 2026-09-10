@@ -280,6 +280,12 @@ function AdminComments() {
   )
 }
 
+const ROOM_TIMES = Array.from({ length: 28 }, (_, i) => {
+    const h = Math.floor(i / 2) + 10
+    const m = (i % 2) * 30
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+  })
+
 function AdminShowtimes() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [cinemas, setCinemas] = useState<Cinema[]>([])
@@ -440,9 +446,20 @@ function AdminShowtimes() {
             <label htmlFor="as-date">Ngày *</label>
             <input id="as-date" type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
           </div>
-          <div className="field" style={{ marginBottom: 0 }}>
-            <label htmlFor="as-time">Giờ *</label>
-            <input id="as-time" type="time" value={fTime} onChange={(e) => setFTime(e.target.value)} />
+          <div className="field" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+            <label>Giờ chiếu *</label>
+            <div className="time-chip-grid">
+              {ROOM_TIMES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`time-chip${fTime === t ? ' is-selected' : ''}`}
+                  onClick={() => setFTime(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="field" style={{ marginBottom: 0 }}>
             <label htmlFor="as-std">Giá thường (VNĐ)</label>
