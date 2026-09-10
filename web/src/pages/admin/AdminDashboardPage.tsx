@@ -300,7 +300,7 @@ function AdminShowtimes() {
   const [fCinema, setFCinema] = useState('')
   const [fRoom, setFRoom] = useState('')
   const [fDate, setFDate] = useState(new Date().toISOString().slice(0, 10))
-  const [fTime, setFTime] = useState('19:30')
+  const [fTimes, setFTimes] = useState<Set<string>>(new Set())
   const [fStd, setFStd] = useState('90000')
   const [fVip, setFVip] = useState('120000')
 
@@ -337,10 +337,18 @@ function AdminShowtimes() {
     setFCinema('')
     setFRoom('')
     setFDate(new Date().toISOString().slice(0, 10))
-    setFTime('19:30')
+    setFTimes(new Set())
     setFStd('90000')
     setFVip('120000')
   }
+
+  const toggleTime = (t: string) =>
+    setFTimes((prev) => {
+      const next = new Set(prev)
+      if (next.has(t)) next.delete(t)
+      else next.add(t)
+      return next
+    })
 
   const startEdit = (st: Showtime) => {
     setEditingId(st.id)
@@ -348,7 +356,8 @@ function AdminShowtimes() {
     setFCinema(st.cinemaId)
     setFRoom(st.roomId)
     setFDate(st.date)
-    setFTime(new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
+    const t = new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+    setFTimes(new Set([t]))
     setFStd(String(st.priceStandard))
     setFVip(String(st.priceVip))
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -356,33 +365,35 @@ function AdminShowtimes() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!fMovie || !fCinema || !fRoom || !fDate || !fTime) {
-      flash('Vui lòng điền đầy đủ: phim, rạp, phòng, ngày, giờ.')
+    if (!fMovie || !fCinema || !fRoom || !fDate || fTimes.size === 0) {
+      flash('Vui lòng điền đầy đủ: phim, rạp, phòng, ngày và chọn ít nhất 1 giờ chiếu.')
       return
     }
     setBusy(true)
     try {
-      const start = new Date(`${fDate}T${fTime}:00`)
       const dur = movies.find((m) => m.id === fMovie)?.durationMinutes || 118
-      const end = new Date(start)
-      end.setMinutes(end.getMinutes() + dur)
-      const payload = {
-        movieId: fMovie,
-        cinemaId: fCinema,
-        roomId: fRoom,
-        date: fDate,
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
-        priceStandard: Number(fStd) || 90000,
-        priceVip: Number(fVip) || 120000,
+      const sortedTimes = [...fTimes].sort()
+      for (const time of sortedTimes) {
+        const start = new Date(`${fDate}T${time}:00`)
+        const end = new Date(start)
+        end.setMinutes(end.getMinutes() + dur)
+        const payload = {
+          movieId: fMovie,
+          cinemaId: fCinema,
+          roomId: fRoom,
+          date: fDate,
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          priceStandard: Number(fStd) || 90000,
+          priceVip: Number(fVip) || 120000,
+        }
+        if (editingId) {
+          await showtimeService.update(editingId, payload)
+        } else {
+          await showtimeService.add(payload)
+        }
       }
-      if (editingId) {
-        await showtimeService.update(editingId, payload)
-        flash('Đã cập nhật suất chiếu.')
-      } else {
-        await showtimeService.add(payload)
-        flash('Đã thêm suất chiếu mới.')
-      }
+      flash(editingId ? 'Đã cập nhật suất chiếu.' : `Đã thêm ${sortedTimes.length} suất chiếu.`)
       await loadAll()
       resetForm()
     } catch (err) {
@@ -447,14 +458,14 @@ function AdminShowtimes() {
             <input id="as-date" type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
           </div>
           <div className="field" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
-            <label>Giờ chiếu *</label>
+            <label>Giờ chiếu * {fTimes.size > 0 && <span style={{ fontWeight: 400, color: 'var(--accent)' }}>({fTimes.size} giờ đã chọn)</span>}</label>
             <div className="time-chip-grid">
               {ROOM_TIMES.map((t) => (
                 <button
                   key={t}
                   type="button"
-                  className={`time-chip${fTime === t ? ' is-selected' : ''}`}
-                  onClick={() => setFTime(t)}
+                  className={`time-chip${fTimes.has(t) ? ' is-selected' : ''}`}
+                  onClick={() => toggleTime(t)}
                 >
                   {t}
                 </button>
