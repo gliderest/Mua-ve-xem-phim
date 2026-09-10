@@ -13,6 +13,7 @@ import { catalogRouter } from './routes/catalog.js'
 import { bookingRouter, sepayWebhookRouter } from './routes/bookings.js'
 import { contactRouter } from './routes/contact.js'
 import { adminRouter } from './routes/admin.js'
+import { tmdbRouter } from './routes/tmdb.js'
 
 export const app = express()
 
@@ -22,6 +23,7 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         connectSrc: ["'self'", 'https://api.themoviedb.org'],
+        frameSrc: ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
         imgSrc: ["'self'", 'data:', 'blob:', 'https://image.tmdb.org'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
@@ -47,6 +49,7 @@ app.use(healthRouter)
 // API endpoints
 app.use('/api/auth', authRouter)
 app.use('/api', catalogRouter) // /movies, /cinemas, /rooms, /showtimes, ...
+app.use('/api/tmdb', tmdbRouter) // proxy TMDB (trailer) — phải đặt TRƯỚC bookingRouter vì router đó có global requireAuth
 app.use('/api', bookingRouter) // /bookings, /bookings/:id/mock-pay
 app.use('/api', contactRouter) // /contact
 app.use('/api', sepayWebhookRouter) // /api/webhooks/sepay
