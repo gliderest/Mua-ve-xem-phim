@@ -81,12 +81,6 @@ export const IconArrowLeft = (p: IconProps) => (
   </svg>
 )
 
-export const IconExternalLink = (p: IconProps) => (
-  <svg {...base(p)}>
-    <path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5" />
-  </svg>
-)
-
 export const IconClose = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M6 6l12 12M18 6L6 18" />

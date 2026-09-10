@@ -149,14 +149,14 @@ async function videos(tmdbId: number): Promise<{ youtubeKey: string; type: strin
   }
 
   try {
-    // Hầu hết trailer chỉ có bản en-US — lấy trước, vi-VN chỉ là bổ sung
-    const [en, vn] = await Promise.all([
-      fetchJson<TVideosResponse>(`/movie/${tmdbId}/videos?language=en-US`),
+    // Ưu tiên vi-VN (trailer bản địa thường cho phép nhúng), nếu rỗng mới lấy en-US
+    const [vn, en] = await Promise.all([
       fetchJson<TVideosResponse>(`/movie/${tmdbId}/videos?language=vi-VN`),
+      fetchJson<TVideosResponse>(`/movie/${tmdbId}/videos?language=en-US`),
     ])
-    const enResults = en.results ?? []
-    const enIds = new Set(enResults.map((v) => v.key))
-    const merged = [...enResults, ...(vn.results ?? []).filter((v) => !enIds.has(v.key))]
+    const vnResults = vn.results ?? []
+    const vnIds = new Set(vnResults.map((v) => v.key))
+    const merged = [...vnResults, ...(en.results ?? []).filter((v) => !vnIds.has(v.key))]
     const yt = pickYoutube(merged)
     if (!yt) return null
     return { youtubeKey: yt.key, type: yt.type }
