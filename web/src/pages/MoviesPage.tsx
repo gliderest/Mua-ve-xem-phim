@@ -18,7 +18,7 @@ export function MoviesPage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['key']>('ALL')
   const [query, setQuery] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
-  useReveal(listRef, [movies, loading])
+  useReveal(listRef, [movies, loading, filter, query])
 
   useEffect(() => {
     movieService.list().then(setMovies).finally(() => setLoading(false))
