@@ -51,10 +51,10 @@ tmdbRouter.get('/videos/:tmdbId', async (req: Request, res, next) => {
       ok(res, null)
       return
     }
-    // Hầu hết trailer chỉ có bản en-US — lấy trước, vi-VN chỉ là bổ sung
-    const [en, vn] = await Promise.all([fetchVideos(tmdbId, 'en-US'), fetchVideos(tmdbId, 'vi-VN')])
-    const enIds = new Set(en.map((v) => v.id))
-    const merged = [...en, ...vn.filter((v) => !enIds.has(v.id))]
+    // Ưu tiên vi-VN (trailer bản địa thường cho phép nhúng), nếu rỗng mới lấy en-US
+    const [vn, en] = await Promise.all([fetchVideos(tmdbId, 'vi-VN'), fetchVideos(tmdbId, 'en-US')])
+    const vnIds = new Set(vn.map((v) => v.id))
+    const merged = [...vn, ...en.filter((v) => !vnIds.has(v.id))]
     const best = pickYoutube(merged)
     ok(res, best ? { youtubeKey: best.key, type: best.type } : null)
   } catch (e) { next(e) }
