@@ -1706,6 +1706,34 @@
   font-size: var(--text-sm);
 }
 
+/* ---------- Admin time chip grid ---------- */
+.time-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.time-chip {
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.time-chip:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.time-chip.is-selected {
+  background: var(--grad-gold);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px -2px var(--accent-glow);
+}
+
 /* ---------- Theme toggle (light/dark) ---------- */
 .theme-toggle {
   display: grid;

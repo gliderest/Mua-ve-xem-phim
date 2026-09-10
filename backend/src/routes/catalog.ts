@@ -110,6 +110,27 @@ catalogRouter.get('/cinemas/:id', async (req: Request, res, next) => {
   } catch (e) { next(e) }
 })
 
+/* ---------------- Showtimes của rạp (user chọn rạp trước khi xem phim) ---------------- */
+catalogRouter.get('/cinemas/:id/showtimes', async (req: Request, res, next) => {
+  try {
+    const date = req.query.date as string | undefined
+    let query = supabaseAdmin
+      .from('showtimes')
+      .select('*, movie:movies(id, title, slug, poster_url, status, duration_minutes, genre)')
+      .eq('cinema_id', req.params.id)
+      .order('start_time', { ascending: true })
+    if (date) {
+      query = query.eq('date', date)
+    } else {
+      // Mặc định: lấy suất từ hôm nay trở đi
+      query = query.gte('date', new Date().toISOString().slice(0, 10))
+    }
+    const { data, error } = await query
+    if (error) throw error
+    ok(res, data ?? [])
+  } catch (e) { next(e) }
+})
+
 catalogRouter.get('/rooms/:id', async (req: Request, res, next) => {
   try {
     const { data: room, error: roomErr } = await supabaseAdmin
