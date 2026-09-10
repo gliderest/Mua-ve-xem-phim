@@ -1898,6 +1898,49 @@
   margin-bottom: var(--space-3);
 }
 
+/* ---------- MovieDetail light ---------- */
+[data-theme='light'] .detail-hero--full { color: var(--text-primary); }
+[data-theme='light'] .detail-hero--full .detail-info__title { color: var(--text-primary); }
+[data-theme='light'] .detail-hero--full .detail-info__meta { color: var(--text-secondary); }
+[data-theme='light'] .detail-hero--full .btn--ghost { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
+[data-theme='light'] .detail-crumb,
+[data-theme='light'] .detail-crumb a { color: var(--text-secondary); }
+[data-theme='light'] .detail-crumb a:hover { color: var(--text-primary); }
+[data-theme='light'] .detail-hero--full .badge { background: var(--accent); color: #fff; }
+
+/* ---------- Cinema photo light (trang Rạp) ---------- */
+[data-theme='light'] .cinema-photo::before {
+  background: linear-gradient(90deg, rgba(245, 237, 224, 0.92) 0%, rgba(245, 237, 224, 0.7) 50%, rgba(245, 237, 224, 0.4) 100%);
+}
+[data-theme='light'] .cinema-photo .section-title,
+[data-theme='light'] .cinema-photo h1,
+[data-theme='light'] .cinema-photo h2 { color: var(--text-primary); }
+[data-theme='light'] .cinema-photo .eyebrow { color: var(--accent); }
+[data-theme='light'] .cinema-photo > .container > p,
+[data-theme='light'] .cinema-photo .section-head p { color: var(--text-secondary); }
+[data-theme='light'] .cinema-photo .btn--ghost { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
+
+/* ---------- Detail light ---------- */
+[data-theme='light'] .detail-trailer { background: var(--surface); }
+[data-theme='light'] .detail-trailer__fallback { background: var(--bg-secondary); }
+[data-theme='light'] .detail-trailer__note { color: var(--text-secondary); }
+
+/* ---------- Footer + admin sidebar + card ---------- */
+[data-theme='light'] footer { color: var(--text-secondary); }
+[data-theme='light'] footer h4 { color: var(--text-primary); }
+[data-theme='light'] .admin-sidebar { background: var(--surface); border-right-color: var(--border); }
+[data-theme='light'] .admin-sidebar a { color: var(--text-secondary); }
+[data-theme='light'] .admin-sidebar a:hover { color: var(--text-primary); background: var(--accent-faint); }
+[data-theme='light'] .admin-sidebar a.is-active { color: var(--accent); background: var(--accent-faint); }
+[data-theme='light'] .card { background: var(--surface); }
+[data-theme='light'] ::-webkit-scrollbar-track { background: var(--bg-primary); }
+[data-theme='light'] ::-webkit-scrollbar-thumb { background: var(--surface-3); border-color: var(--bg-primary); }
+[data-theme='light'] .cinema-strip { border-color: var(--border); }
+[data-theme='light'] .hero::after,
+[data-theme='light'] .detail-hero--full::after {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-primary) 100%);
+}
+
 /* ---------- Admin time chip grid ---------- */
 .time-chip-grid {
   display: flex;
@@ -2018,6 +2061,28 @@
   pointer-events: none;
   z-index: 1;
 }
+
+/* ---------- Navbar light mode ---------- */
+[data-theme='light'] .nav {
+  background: linear-gradient(90deg, #c45500 0%, #ff8a3d 48%, #e8620c 100%);
+}
+[data-theme='light'] .nav__logo,
+[data-theme='light'] .nav__logo-dot,
+[data-theme='light'] .nav__link,
+[data-theme='light'] .nav__link:hover,
+[data-theme='light'] .nav__link.is-active,
+[data-theme='light'] .nav__burger,
+[data-theme='light'] .nav .btn--ghost { color: #fff; }
+[data-theme='light'] .nav .btn--ghost { border-color: rgba(255,255,255,0.42); background: rgba(255,255,255,0.12); }
+[data-theme='light'] .nav .btn--ghost:hover { border-color: #fff; background: rgba(255,255,255,0.2); }
+
+/* ---------- Hero slide light ---------- */
+[data-theme='light'] .hero--slide .hero__title,
+[data-theme='light'] .hero--slide .hero__eyebrow,
+[data-theme='light'] .hero--slide .hero__subtitle { color: var(--text-primary); }
+[data-theme='light'] .hero--slide .hero__subtitle { color: var(--text-secondary); }
+[data-theme='light'] .hero--slide .hero__actions .btn--ghost { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
+[data-theme='light'] .hero__arrow { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
 
 /* ---------- Cinema photo backdrop (ràp chiếu, overlay tối) ---------- */
 .cinema-photo {
