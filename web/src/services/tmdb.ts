@@ -110,23 +110,59 @@ interface TVideo {
   key: string
   site: string
   type: string
+  official?: boolean
 }
 
 interface TVideosResponse {
-  results: TVideo[]
+  results?: TVideo[]
 }
 
-/** Lấy YouTube trailer/key từ TMDB */
+/** Chọn video YouTube tốt nhất: Trailer official > Trailer > Teaser > video bất kỳ */
+function pickYoutube(videos: TVideo[]): TVideo | null {
+  const yt = videos.filter((v) => v.site === 'YouTube')
+  return (
+    yt.find((v) => v.type === 'Trailer' && v.official) ??
+    yt.find((v) => v.type === 'Trailer') ??
+    yt.find((v) => v.type === 'Teaser') ??
+    yt[0] ??
+    null
+  )
+}
+
+/**
+ * Lấy YouTube trailer/key từ TMDB.
+ * - Nếu có VITE_TMDB_API_KEY (client) → gọi thẳng TMDB, ưu tiên en-US rồi vi-VN.
+ * - Nếu không có key client → gọi proxy backend /api/tmdb/videos/:id
+ *   (backend dùng TMDB_API_KEY phía server, tránh nhúng key vào bundle).
+ */
 async function videos(tmdbId: number): Promise<{ youtubeKey: string; type: string } | null> {
-  const data = await fetchJson<TVideosResponse>(
-    `/movie/${tmdbId}/videos?language=vi-VN`,
-  )
-  const yt = (data.results ?? []).find(
-    (v) => v.site === 'YouTube' && v.type === 'Trailer',
-  )
-    ?? (data.results ?? []).find((v) => v.site === 'YouTube')
-  if (!yt) return null
-  return { youtubeKey: yt.key, type: yt.type }
+  if (!hasKey()) {
+    try {
+      const res = await fetch(`/api/tmdb/videos/${tmdbId}`)
+      if (!res.ok) return null
+      const j = (await res.json()) as { data?: { youtubeKey?: string; type?: string } }
+      const d = j?.data
+      return d?.youtubeKey ? { youtubeKey: d.youtubeKey, type: d.type ?? 'Trailer' } : null
+    } catch {
+      return null
+    }
+  }
+
+  try {
+    // Hầu hết trailer chỉ có bản en-US — lấy trước, vi-VN chỉ là bổ sung
+    const [en, vn] = await Promise.all([
+      fetchJson<TVideosResponse>(`/movie/${tmdbId}/videos?language=en-US`),
+      fetchJson<TVideosResponse>(`/movie/${tmdbId}/videos?language=vi-VN`),
+    ])
+    const enResults = en.results ?? []
+    const enIds = new Set(enResults.map((v) => v.key))
+    const merged = [...enResults, ...(vn.results ?? []).filter((v) => !enIds.has(v.key))]
+    const yt = pickYoutube(merged)
+    if (!yt) return null
+    return { youtubeKey: yt.key, type: yt.type }
+  } catch {
+    return null
+  }
 }
 
 export const tmdbService = {
