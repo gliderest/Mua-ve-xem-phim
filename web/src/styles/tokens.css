@@ -54,12 +54,12 @@
   --font-display: "Cormorant Garamond", "Georgia", serif;
   --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
 
-  --text-xs: 0.72rem;
-  --text-sm: 0.82rem;
-  --text-base: 0.95rem;
-  --text-lg: 1.15rem;
-  --text-xl: 1.45rem;
-  --text-2xl: 1.9rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
   --text-3xl: 2.5rem;
   --text-4xl: 3.4rem;
   --text-5xl: 4.6rem;
@@ -111,10 +111,10 @@
   --surface-2: #fffaf2;
   --surface-3: #f1e7d7;
 
-  --text-primary: #241a10;
-  --text-secondary: #4f4338;
-  --text-muted: #6f5f4e;
-  --text-faint: #8f7f6c;
+  --text-primary: #1a1008;
+  --text-secondary: #3d2e1e;
+  --text-muted: #604e3c;
+  --text-faint: #8a7660;
 
   --accent: #e8620c;
   --accent-strong: #ff7c26;

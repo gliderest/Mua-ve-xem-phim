@@ -1706,6 +1706,198 @@
   font-size: var(--text-sm);
 }
 
+[data-theme='light'] .page-hero--dark {
+  background:
+    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.12), transparent 60%),
+    linear-gradient(180deg, #f5ede0 0%, #efe5d3 100%);
+  color: var(--text-primary);
+}
+[data-theme='light'] .page-hero--dark .section-title { color: var(--text-primary); }
+[data-theme='light'] .page-hero--dark .eyebrow { color: var(--accent); }
+[data-theme='light'] .page-hero--dark .field label { color: var(--text-secondary); }
+[data-theme='light'] .page-hero--dark .field input {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+[data-theme='light'] .page-hero--dark .field input::placeholder { color: var(--text-faint); }
+[data-theme='light'] .page-hero--dark .showtime-chip {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  backdrop-filter: blur(6px);
+}
+[data-theme='light'] .page-hero--dark .showtime-chip:hover {
+  border-color: var(--accent);
+  background: var(--accent-faint);
+}
+[data-theme='light'] .page-hero--dark .showtime-chip.is-selected {
+  background: var(--grad-gold);
+  color: #fff;
+  border-color: transparent;
+}
+[data-theme='light'] .page-hero--dark .btn--ghost {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+[data-theme='light'] .page-hero--dark .state-empty p { color: var(--text-secondary); }
+
+[data-theme='light'] .theme-toggle {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+[data-theme='light'] .theme-toggle:hover {
+  background: var(--accent-faint);
+  color: var(--accent);
+}
+
+[data-theme='light'] .hero::after,
+[data-theme='light'] .page-hero--dark::after {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-primary) 100%);
+}
+[data-theme='light'] .page-hero--dark .page-hero__ticker-track span {
+  color: rgba(26, 16, 8, 0.25);
+}
+[data-theme='light'] .page-hero--dark .page-hero__float {
+  background: var(--accent-soft);
+}
+[data-theme='light'] .detail-crumb,
+[data-theme='light'] .detail-crumb a { color: var(--text-secondary); }
+[data-theme='light'] .detail-crumb a:hover { color: var(--text-primary); }
+[data-theme='light'] .detail-crumb span:last-child { color: var(--accent); }
+
+/* Light mode cinema cards + date pills */
+[data-theme='light'] .cinema-card-select {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+[data-theme='light'] .cinema-card-select:hover {
+  border-color: var(--accent);
+  background: var(--accent-faint);
+}
+[data-theme='light'] .cinema-card-select.is-selected {
+  border-color: var(--accent-strong);
+  background: linear-gradient(135deg, rgba(232,98,12,0.06), rgba(255,138,61,0.04));
+  box-shadow: 0 0 0 3px rgba(232,98,12,0.15), var(--shadow-soft);
+}
+[data-theme='light'] .cinema-card-select__addr { color: var(--text-muted); }
+[data-theme='light'] .cinema-card-select.is-selected .cinema-card-select__addr { color: var(--text-secondary); }
+
+[data-theme='light'] .date-pill {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+[data-theme='light'] .date-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+[data-theme='light'] .date-pill.is-selected {
+  background: var(--grad-gold);
+  color: #fff;
+}
+[data-theme='light'] .hero-label { color: var(--text-faint); }
+
+/* ---------- Cinema selector cards ---------- */
+.cinema-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+.cinema-card-select {
+  position: relative;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  text-align: left;
+  color: #fff;
+}
+.cinema-card-select:hover {
+  border-color: var(--accent);
+  background: rgba(232, 98, 12, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -12px rgba(232, 98, 12, 0.2);
+}
+.cinema-card-select.is-selected {
+  border-color: var(--accent-strong);
+  background: linear-gradient(135deg, rgba(232, 98, 12, 0.15), rgba(255, 138, 61, 0.08));
+  box-shadow: 0 0 0 3px rgba(232, 98, 12, 0.25), 0 12px 32px -12px rgba(232, 98, 12, 0.3);
+}
+.cinema-card-select.is-selected::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.cinema-card-select__name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+  letter-spacing: 0.02em;
+}
+.cinema-card-select__addr {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.55);
+}
+.cinema-card-select.is-selected .inema-card-select__addr { color: rgba(255, 255, 255, 0.7); }
+
+/* Date selector — horizontal scroll */
+.date-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block: var(--space-1);
+}
+.date-strip::-webkit-scrollbar { display: none; }
+.date-pill {
+  flex-shrink: 0;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.date-pill:hover {
+  border-color: var(--accent);
+  color: #fff;
+}
+.date-pill.is-selected {
+  background: var(--grad-gold);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px -4px var(--accent-glow);
+}
+
+/* Section labels */
+.hero-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: var(--space-3);
+}
+
 /* ---------- Admin time chip grid ---------- */
 .time-chip-grid {
   display: flex;

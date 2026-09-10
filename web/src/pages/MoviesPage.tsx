@@ -81,24 +81,38 @@ export function MoviesPage() {
             Khám phá <em>danh mục phim</em>
           </h1>
           <div style={{ marginTop: 'var(--space-5)' }}>
-            <label style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)', display: 'block', marginBottom: 'var(--space-2)' }}>Chọn rạp</label>
-            <div className="showtime-chip-list">
+            <span className="hero-label">Chọn rạp</span>
+            <div className="cinema-card-list">
               {cinemas.map((c) => (
-                <button key={c.id} className={`showtime-chip${selectedCinema === c.id ? ' is-selected' : ''}`} onClick={() => setSelectedCinema(c.id)}>{c.name}</button>
+                <button
+                  key={c.id}
+                  className={`cinema-card-select${selectedCinema === c.id ? ' is-selected' : ''}`}
+                  onClick={() => setSelectedCinema(c.id)}
+                >
+                  <div className="cinema-card-select__name">{c.name}</div>
+                  <div className="cinema-card-select__addr">{c.district || c.address}</div>
+                </button>
               ))}
             </div>
           </div>
+
           {selectedCinema && (
             <div style={{ marginTop: 'var(--space-4)' }}>
-              <div className="showtime-chip-list">
+              <span className="hero-label">Ngày xem</span>
+              <div className="date-strip">
                 {dates.map((d) => (
-                  <button key={d.value} className={`showtime-chip${selectedDate === d.value ? ' is-selected' : ''}`} onClick={() => setSelectedDate(d.value)}>
+                  <button
+                    key={d.value}
+                    className={`date-pill${selectedDate === d.value ? ' is-selected' : ''}`}
+                    onClick={() => setSelectedDate(d.value)}
+                  >
                     {d.isToday ? 'Hôm nay' : d.label}
                   </button>
                 ))}
               </div>
             </div>
           )}
+
           {selectedCinema && (
             <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-5)', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
               <div className="showtime-chip-list">
