@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<Movie['status'], { label: string; cls: string }> = {
 
 /**
  * Poster: ảnh thật TMDB. Chỉ fallback về SVG vẽ tay khi ẢNH THẬT SỰ LỖI (onError)
- * hoặc treo quá lâu chưa tải (6s). Khi ảnh đã load xong → GIỮ ẢNH vĩnh viễn,
+ * hoặc treo quá lâu chưa tải (12s). Khi ảnh đã load xong → GIỮ ẢNH vĩnh viễn,
  * timer fallback bị hủy (đây là bug trước: ảnh hiện rồi 5s sau biến mất).
  */
 export function PosterOrArt({ movie }: { movie: Movie }) {
@@ -24,7 +24,7 @@ export function PosterOrArt({ movie }: { movie: Movie }) {
 
   useEffect(() => {
     if (!movie.posterUrl || err || loadedRef.current) return
-    timerRef.current = window.setTimeout(() => setSlow(true), 6000)
+    timerRef.current = window.setTimeout(() => setSlow(true), 12000)
     return () => window.clearTimeout(timerRef.current)
   }, [movie.posterUrl, err])
 
@@ -45,7 +45,7 @@ export function PosterOrArt({ movie }: { movie: Movie }) {
       <img
         src={movie.posterUrl}
         alt={`Poster phim ${movie.title}`}
-        loading="lazy"
+        loading="eager"
         referrerPolicy="no-referrer"
         onError={handleError}
         onLoad={handleLoad}
