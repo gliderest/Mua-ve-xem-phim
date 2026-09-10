@@ -1705,6 +1705,13 @@
   color: rgba(255, 255, 255, 0.8);
   font-size: var(--text-sm);
 }
+.detail-trailer__watch {
+  position: absolute;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
 
 /* ---------- Theme toggle (light/dark) ---------- */
 .theme-toggle {

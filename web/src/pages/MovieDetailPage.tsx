@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { movieService, cinemaService } from '@/services/api'
 import { tmdbService } from '@/services/tmdb'
 import { PosterArt } from '@/components/svg/PosterArt'
-import { IconArrowLeft, IconClock, IconPlay, IconCalendar } from '@/components/svg/Icons'
+import { IconArrowLeft, IconClock, IconPlay, IconCalendar, IconExternalLink } from '@/components/svg/Icons'
 import { formatVND } from '@/data/mock'
 import type { Cinema, Showtime } from '@/types'
 import { CommentSection } from '@/components/common/CommentSection'
@@ -17,6 +17,8 @@ export function MovieDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10))
   const [video, setVideo] = useState<{ youtubeKey: string; type: string } | null>(null)
+  const [trailerFailed, setTrailerFailed] = useState(false)
+  const playerRef = useRef<{ destroy: () => void } | null>(null)
 
   // Lấy trailer YouTube từ TMDB khi có tmdbId
   useEffect(() => {
@@ -30,6 +32,53 @@ export function MovieDetailPage() {
       alive = false
     }
   }, [movie?.tmdbId])
+
+  /**
+   * Dõi lỗi player YouTube nhúng (vd Error 153 "Video player configuration error")
+   * để tự chuyển sang fallback: poster + nút "Xem trailer trên YouTube".
+   * Một số mạng/điều kiện chặn embed dù video thật sự cho phép nhúng.
+   */
+  useEffect(() => {
+    if (!video) return
+    setTrailerFailed(false)
+
+    const YT = (window as unknown as {
+      YT?: { Player: new (id: string, opts: Record<string, unknown>) => { destroy: () => void } }
+    }).YT
+
+    const bindError = () => {
+      const YTNow = (window as unknown as {
+        YT?: { Player: new (id: string, opts: Record<string, unknown>) => { destroy: () => void } }
+      }).YT
+      if (!YTNow?.Player) return false
+      playerRef.current?.destroy()
+      playerRef.current = new YTNow.Player('cinega-trailer-player', {
+        events: {
+          onError: (e: { data: number }) => {
+            // 153 = player configuration; 101/150 = hạn chế nhúng/vùng
+            if (e.data === 153 || e.data === 101 || e.data === 150) setTrailerFailed(true)
+          },
+        },
+      })
+      return true
+    }
+
+    if (!YT?.Player && !document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.head.appendChild(tag)
+    }
+    ;(window as unknown as { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady = bindError
+    if (!bindError()) {
+      // script sẽ load xong và gọi onYouTubeIframeAPIReady
+    }
+
+    return () => {
+      ;(window as unknown as { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady = undefined
+      playerRef.current?.destroy()
+      playerRef.current = null
+    }
+  }, [video])
 
   useEffect(() => {
     if (!id) return
@@ -188,13 +237,31 @@ export function MovieDetailPage() {
 
           <div className="detail-trailer">
             {video ? (
-              <iframe
-                className="detail-trailer__frame"
-                src={`https://www.youtube-nocookie.com/embed/${video.youtubeKey}`}
-                title="Trailer phim"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
+              trailerFailed ? (
+                <div className="detail-trailer__fallback">
+                  <PosterArt movie={movie} />
+                  <p className="detail-trailer__note">
+                    Trailer chưa phát được trong trình phát nhúng tại mạng hiện tại.
+                  </p>
+                  <a
+                    className="btn btn--gold detail-trailer__watch"
+                    href={`https://www.youtube.com/watch?v=${video.youtubeKey}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconExternalLink size={18} /> Xem trailer trên YouTube
+                  </a>
+                </div>
+              ) : (
+                <iframe
+                  id="cinega-trailer-player"
+                  className="detail-trailer__frame"
+                  src={`https://www.youtube-nocookie.com/embed/${video.youtubeKey}?enablejsapi=1&origin=${window.location.origin}`}
+                  title="Trailer phim"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              )
             ) : (
               <div className="detail-trailer__fallback">
                 <PosterArt movie={movie} />
