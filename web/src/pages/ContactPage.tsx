@@ -38,7 +38,7 @@ export function ContactPage() {
         <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
           Chúng tôi <em>lắng nghe</em>
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.85)', marginTop: 'var(--space-2)' }}>
+        <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-2)' }}>
           Mọi thắc mắc về đặt vé, khiếu nại hoặc góp ý — CINEGA phản hồi trong vòng 24 giờ.
         </p>
 

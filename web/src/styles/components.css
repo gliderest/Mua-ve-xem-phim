@@ -1916,11 +1916,27 @@
 [data-theme='light'] .cinema-photo h1,
 [data-theme='light'] .cinema-photo h2 { color: var(--text-primary); }
 [data-theme='light'] .cinema-photo .eyebrow { color: var(--accent); }
+[data-theme='light'] .cinema-photo .nav__logo-dot,
+[data-theme='light'] .cinema-photo h2 .nav__logo-dot { color: var(--accent); }
 [data-theme='light'] .cinema-photo > .container > p,
 [data-theme='light'] .cinema-photo .section-head p { color: var(--text-secondary); }
 [data-theme='light'] .cinema-photo .btn--ghost { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
+[data-theme='light'] .cinema-photo .card { background: var(--surface); border-color: var(--border); }
+[data-theme='light'] .cinema-photo .card h3 { color: var(--text-primary); }
+[data-theme='light'] .cinema-photo .card p { color: var(--text-secondary); }
 
 /* ---------- Detail light ---------- */
+[data-theme='light'] .detail-hero--full { color: var(--text-primary); background: var(--bg-primary); }
+[data-theme='light'] .detail-hero--full::after { background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-primary) 100%); }
+[data-theme='light'] .detail-hero--full .detail-info__title { color: var(--text-primary); }
+[data-theme='light'] .detail-hero--full .detail-info__meta,
+[data-theme='light'] .detail-hero--full .detail-info__desc { color: var(--text-secondary); }
+[data-theme='light'] .detail-hero--full .badge { background: var(--accent); color: #fff; }
+[data-theme='light'] .detail-hero--full .btn--ghost { color: var(--text-primary); border-color: var(--border-strong); background: var(--surface); }
+[data-theme='light'] .detail-crumb,
+[data-theme='light'] .detail-crumb a { color: var(--text-muted); }
+[data-theme='light'] .detail-crumb a:hover { color: var(--text-primary); text-decoration: underline; }
+[data-theme='light'] .detail-crumb span:last-child { color: var(--accent); }
 [data-theme='light'] .detail-trailer { background: var(--surface); }
 [data-theme='light'] .detail-trailer__fallback { background: var(--bg-secondary); }
 [data-theme='light'] .detail-trailer__note { color: var(--text-secondary); }
