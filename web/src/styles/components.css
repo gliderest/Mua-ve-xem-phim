@@ -747,6 +747,15 @@
   border-color: var(--accent-strong);
   color: #fff;
 }
+.showtime-chip--demo {
+  cursor: not-allowed;
+  opacity: 0.85;
+  border-style: dashed;
+}
+.showtime-chip--demo:hover {
+  transform: none;
+  border-color: var(--border-accent);
+}
 
 .date-strip {
   display: flex;
