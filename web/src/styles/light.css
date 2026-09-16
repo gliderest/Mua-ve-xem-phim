@@ -1,174 +1,187 @@
 /* ============================================================
    CINEGA — LIGHT THEME OVERRIDES
    Import SAU components.css để đảm bảo light mode luôn thắng.
+   Các vùng full-bleed hero (cinema-photo, page-hero--dark,
+   detail-hero--full) GIỮ NGUYÊN style dark như dark mode để
+   màu chữ y hệt nhau; chỉ body/content phía dưới mới sáng.
    ============================================================ */
 
-/* ---------- Cinema photo (About / Contact) ---------- */
+/* ---------- Cinema photo (About/Contact) — giữ DARK ---------- */
 [data-theme='light'] .cinema-photo::before {
-  background:
-    linear-gradient(105deg, rgba(247, 241, 230, 0.96) 0%, rgba(247, 241, 230, 0.82) 45%, rgba(247, 241, 230, 0.55) 100%);
+  background: linear-gradient(90deg, rgba(9, 8, 7, 0.88) 0%, rgba(9, 8, 7, 0.55) 50%, rgba(9, 8, 7, 0.3) 100%);
 }
 [data-theme='light'] .cinema-photo .section-title,
 [data-theme='light'] .cinema-photo h1,
 [data-theme='light'] .cinema-photo h2,
 [data-theme='light'] .cinema-photo h3 {
-  color: #241a10;
+  color: #fff;
 }
 [data-theme='light'] .cinema-photo .eyebrow,
 [data-theme='light'] .cinema-photo .nav__logo-dot {
-  color: #e8620c;
+  color: #ffc79a;
 }
 [data-theme='light'] .cinema-photo > .container > p,
 [data-theme='light'] .cinema-photo .section-head p,
 [data-theme='light'] .cinema-photo p {
-  color: #3d2e1e;
+  color: rgba(255, 255, 255, 0.85);
 }
 [data-theme='light'] .cinema-photo .card {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(232, 98, 12, 0.18);
+  background: var(--grad-soft);
+  border-color: var(--border);
 }
 [data-theme='light'] .cinema-photo .card h2,
 [data-theme='light'] .cinema-photo .card h3,
 [data-theme='light'] .cinema-photo .card h4,
 [data-theme='light'] .cinema-photo .card strong {
-  color: #241a10;
+  color: var(--text-primary);
 }
 [data-theme='light'] .cinema-photo .card p,
 [data-theme='light'] .cinema-photo .card li {
-  color: #4a3a28;
+  color: var(--text-secondary);
 }
 [data-theme='light'] .cinema-photo .card .nav__logo-dot,
 [data-theme='light'] .cinema-photo .card span.nav__logo-dot {
-  color: #e8620c;
+  color: var(--accent-strong);
 }
 [data-theme='light'] .cinema-photo .field input,
 [data-theme='light'] .cinema-photo .field textarea,
 [data-theme='light'] .cinema-photo .field select {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.18);
-  color: #241a10;
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
 }
 [data-theme='light'] .cinema-photo .field label {
-  color: #4a3a28;
+  color: rgba(255, 255, 255, 0.78);
 }
 [data-theme='light'] .cinema-photo .btn--ghost,
 [data-theme='light'] .cinema-photo .btn--surface {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.22);
-  color: #3d2e1e;
+  background: rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
 }
 
-/* ---------- Page hero (Movies) ---------- */
+/* ---------- Page hero (Movies) — giữ DARK ---------- */
 [data-theme='light'] .page-hero--dark {
   background:
-    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.12), transparent 60%),
-    linear-gradient(180deg, #f6ecd9 0%, #efe2c8 100%);
-  color: #241a10;
+    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.22), transparent 60%),
+    linear-gradient(180deg, #241709 0%, #3a200e 100%);
+  color: #fff;
 }
 [data-theme='light'] .page-hero--dark .section-title,
 [data-theme='light'] .page-hero--dark h1,
 [data-theme='light'] .page-hero--dark h2 {
-  color: #241a10;
+  color: #fff;
 }
 [data-theme='light'] .page-hero--dark .eyebrow {
-  color: #e8620c;
+  color: var(--accent-strong);
 }
 [data-theme='light'] .page-hero--dark .hero-label {
-  color: #6b563c;
+  color: rgba(255, 255, 255, 0.5);
 }
 [data-theme='light'] .page-hero--dark .field label {
-  color: #4a3a28;
+  color: rgba(255, 255, 255, 0.78);
 }
 [data-theme='light'] .page-hero--dark .field input {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.2);
-  color: #241a10;
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
 }
-/* ---------- Cinema cards + date pills (Movies) ---------- */
+[data-theme='light'] .page-hero--dark .field input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- Cinema cards + date pills (Movies) — giữ DARK glass ---------- */
 [data-theme='light'] .cinema-card-select {
-  background: rgba(255, 255, 255, 0.75);
-  border-color: rgba(43, 31, 21, 0.16);
-  color: #241a10;
-  box-shadow: 0 6px 20px -10px rgba(43, 31, 21, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: none;
 }
 [data-theme='light'] .cinema-card-select:hover {
-  border-color: #e8620c;
-  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent);
+  background: rgba(232, 98, 12, 0.08);
 }
 [data-theme='light'] .cinema-card-select.is-selected {
-  border-color: #e8620c;
-  background: linear-gradient(135deg, rgba(255, 138, 61, 0.14), rgba(232, 98, 12, 0.06));
-  box-shadow: 0 0 0 3px rgba(232, 98, 12, 0.16), 0 12px 32px -12px rgba(232, 98, 12, 0.25);
+  border-color: var(--accent-strong);
+  background: linear-gradient(135deg, rgba(232, 98, 12, 0.15), rgba(255, 138, 61, 0.08));
+  box-shadow: 0 0 0 3px rgba(232, 98, 12, 0.25);
 }
 [data-theme='light'] .cinema-card-select__name {
-  color: #241a10;
+  color: #fff;
 }
 [data-theme='light'] .cinema-card-select__addr {
-  color: #6b563c;
+  color: rgba(255, 255, 255, 0.55);
 }
 [data-theme='light'] .date-pill {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.2);
-  color: #4a3a28;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
 }
 [data-theme='light'] .date-pill:hover {
-  border-color: #e8620c;
-  color: #e8620c;
+  border-color: var(--accent);
+  color: #fff;
 }
 [data-theme='light'] .date-pill.is-selected {
-  background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #c24a00 100%);
+  background: var(--grad-gold);
   color: #fff;
   border-color: transparent;
 }
 [data-theme='light'] .page-hero--dark .showtime-chip {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.2);
-  color: #4a3a28;
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
 }
 [data-theme='light'] .page-hero--dark .showtime-chip:hover {
-  border-color: #e8620c;
-  background: rgba(232, 98, 12, 0.08);
-  color: #e8620c;
+  border-color: var(--accent-strong);
+  background: rgba(232, 98, 12, 0.18);
+  color: #fff;
 }
 [data-theme='light'] .page-hero--dark .showtime-chip.is-selected {
-  background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #c24a00 100%);
+  background: var(--grad-gold);
   color: #fff;
   border-color: transparent;
 }
 
-/* ---------- Movie detail ---------- */
+/* ---------- Movie detail hero — giữ DARK ---------- */
 [data-theme='light'] .detail-hero--full {
-  background: linear-gradient(180deg, #f6ecd9 0%, #faf5ec 100%);
-  color: #241a10;
+  background: linear-gradient(180deg, #201018 0%, #140b10 100%);
+  color: #fff;
+}
+[data-theme='light'] .detail-hero--full::after {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--feather-dark) 100%);
 }
 [data-theme='light'] .detail-hero--full .detail-crumb,
 [data-theme='light'] .detail-hero--full .detail-crumb a {
-  color: #6b563c;
+  color: rgba(255, 255, 255, 0.78);
 }
 [data-theme='light'] .detail-hero--full .detail-crumb a:hover {
-  color: #241a10;
+  color: #fff;
 }
 [data-theme='light'] .detail-hero--full .detail-crumb span:last-child {
-  color: #e8620c;
+  color: var(--accent-strong);
 }
 [data-theme='light'] .detail-hero--full .detail-info__title {
-  color: #241a10;
+  color: #fff;
 }
 [data-theme='light'] .detail-hero--full .detail-info__meta,
 [data-theme='light'] .detail-hero--full .detail-info__desc,
 [data-theme='light'] .detail-hero--full .detail-info__meta-item dd,
 [data-theme='light'] .detail-hero--full .detail-info__meta-item dt {
-  color: #4a3a28;
+  color: rgba(255, 255, 255, 0.82);
+}
+[data-theme='light'] .detail-hero--full .detail-info__sub,
+[data-theme='light'] .detail-hero--full .detail-info__sub span {
+  color: rgba(255, 255, 255, 0.82);
 }
 [data-theme='light'] .detail-hero--full .btn--ghost {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.22);
-  color: #3d2e1e;
+  background: rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #fff;
 }
 [data-theme='light'] .detail-track,
 [data-theme='light'] .detail-trailer {
-  background: #fff;
-  border-color: rgba(43, 31, 21, 0.14);
+  background: #0d0d11;
+  border-color: var(--border-accent);
 }
 
 /* ---------- Movie rows / cards list ---------- */
@@ -203,13 +216,10 @@
   letter-spacing: 0.04em;
 }
 
-/* ---------- Movie titles — gradient cam nổi ---------- */
+/* ---------- Movie titles (card/list) — gradient cam nổi ---------- */
 [data-theme='light'] .movie-card__title a,
 [data-theme='light'] .movie-row__title a,
-[data-theme='light'] .movie-row__title,
-[data-theme='light'] .detail-info__title,
-[data-theme='light'] .detail-hero--full .detail-info__title,
-[data-theme='light'] .hero--slide .hero__title {
+[data-theme='light'] .movie-row__title {
   color: transparent;
   background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #a33a00 100%);
   -webkit-background-clip: text;
