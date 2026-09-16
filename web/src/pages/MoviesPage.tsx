@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { cinemaService, showtimeService } from '@/services/api'
+import { cinemaService, movieService, showtimeService } from '@/services/api'
 import { useReveal } from '@/lib/gsap'
 import { IconSearch } from '@/components/svg/Icons'
 import type { Cinema, Movie, Showtime } from '@/types'
@@ -33,14 +33,17 @@ export function MoviesPage() {
   useEffect(() => {
     if (!selectedCinema) return
     setLoading(true)
-    showtimeService.byCinema(selectedCinema, selectedDate).then((sts) => {
+    Promise.all([
+      showtimeService.byCinema(selectedCinema, selectedDate),
+      movieService.list(),
+    ]).then(([sts, allMovies]) => {
       setCinemaShowtimes(sts)
-      const ids = new Set<string>()
+      // Tab "Tất cả" phải hiện cả phim Đang chiếu + Sắp chiếu (không dùng phim ENDED)
       const unique: Movie[] = []
-      for (const s of sts) {
-        if (s.movie && !ids.has(s.movie.id)) {
-          ids.add(s.movie.id)
-          unique.push(s.movie)
+      const added = new Set<string>()
+      for (const m of allMovies) {
+        if (m.status === 'NOW_SHOWING' || m.status === 'COMING_SOON') {
+          if (!added.has(m.id)) { added.add(m.id); unique.push(m) }
         }
       }
       setMovies(unique)
@@ -170,25 +173,38 @@ function MovieRowWithShowtimes({ movie, showtimes }: { movie: Movie; showtimes: 
   const times = showtimes
     .sort((a, b) => a.startTime.localeCompare(b.startTime))
     .map((s) => ({ time: new Date(s.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }), id: s.id }))
+
   return (
-    <Link to={`/movies/${movie.id}`} className="movie-row">
-      <div className="movie-row__poster">
-        {movie.posterUrl ? <img src={movie.posterUrl} alt={'Poster phim ' + movie.title} loading="eager" /> : <div className="movie-row__poster-art" />}
+    <article className="movie-row">
+      <Link to={`/movies/${movie.id}`} className="movie-row__poster" aria-label={`Xem phim ${movie.title}`}>
+        {movie.posterUrl ? <img src={movie.posterUrl} alt={`Poster phim ${movie.title}`} loading="eager" /> : <div className="movie-row__poster-art" />}
         {movie.status === 'NOW_SHOWING' && <span className="movie-row__badge">Đang chiếu</span>}
-      </div>
+      </Link>
       <div className="movie-row__info">
-        <h3 className="movie-row__title">{movie.title}</h3>
+        <h3 className="movie-row__title">
+          <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
+        </h3>
         <div className="movie-row__meta">
           {movie.genre.slice(0, 2).join(' · ')} · {movie.durationMinutes || 120} phút
         </div>
-        {times.length > 0 && (
+        {times.length > 0 ? (
           <div className="movie-row__showtimes">
-            {times.map((t) => (
-              <span key={t.id} className="showtime-chip" style={{ pointerEvents: 'none' }}>{t.time}</span>
-            ))}
+            {times.map((t) => {
+              // Suất thật (admin tạo) → đi thẳng đến đặt vé; suất mặc định → xem chi tiết phim
+              const to = String(t.id).startsWith('syn-') ? `/movies/${movie.id}` : `/booking/${t.id}`
+              return (
+                <Link key={t.id} to={to} className="showtime-chip" aria-label={`${movie.title} lúc ${t.time}`}>
+                  {t.time}
+                </Link>
+              )
+            })}
           </div>
+        ) : movie.status === 'COMING_SOON' ? (
+          <span className="badge badge--gold">Sắp chiếu</span>
+        ) : (
+          <span className="badge">Chưa có suất ngày này</span>
         )}
       </div>
-    </Link>
+    </article>
   )
 }
