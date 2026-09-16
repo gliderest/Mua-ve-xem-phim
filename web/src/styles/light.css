@@ -186,14 +186,32 @@
   color: #4a3a28;
 }
 
-/* ---------- Movie titles — nổi, gradient cam (light) ---------- */
+/* ---------- Genre text → CAM (giống dark mode) ---------- */
+[data-theme='light'] .detail-info__sub,
+[data-theme='light'] .detail-info__sub span,
+[data-theme='light'] .detail-hero--full .detail-info__sub,
+[data-theme='light'] .movie-card__meta span:first-child,
+[data-theme='light'] .movie-card__genre,
+[data-theme='light'] .movie-card__meta,
+[data-theme='light'] .movie-row__meta {
+  color: #c24a00;
+}
+[data-theme='light'] .detail-info__sub,
+[data-theme='light'] .movie-card__meta,
+[data-theme='light'] .movie-row__meta {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Movie titles — gradient cam nổi ---------- */
 [data-theme='light'] .movie-card__title a,
 [data-theme='light'] .movie-row__title a,
 [data-theme='light'] .movie-row__title,
 [data-theme='light'] .detail-info__title,
+[data-theme='light'] .detail-hero--full .detail-info__title,
 [data-theme='light'] .hero--slide .hero__title {
   color: transparent;
-  background: linear-gradient(135deg, #e8620c 0%, #a33a00 60%, #7a2b00 100%);
+  background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #a33a00 100%);
   -webkit-background-clip: text;
   background-clip: text;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
@@ -201,7 +219,7 @@
 [data-theme='light'] .movie-card__genre,
 [data-theme='light'] .movie-card__meta,
 [data-theme='light'] .movie-row__meta {
-  color: #8a5a28;
+  color: #c24a00;
   font-weight: 600;
 }
 [data-theme='light'] .movie-row__showtimes .showtime-chip,
