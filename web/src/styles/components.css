@@ -1406,6 +1406,16 @@
   font-size: var(--text-xs);
   letter-spacing: 0.05em;
 }
+.movie-row__showtimes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.movie-row__showtimes .showtime-chip {
+  padding: 0.42rem 0.85rem;
+  font-size: var(--text-sm);
+}
 .movie-row__dot {
   width: 3px;
   height: 3px;
