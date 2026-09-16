@@ -1,0 +1,280 @@
+/* ============================================================
+   CINEGA — LIGHT THEME OVERRIDES
+   Import SAU components.css để đảm bảo light mode luôn thắng.
+   ============================================================ */
+
+/* ---------- Cinema photo (About / Contact) ---------- */
+[data-theme='light'] .cinema-photo::before {
+  background:
+    linear-gradient(105deg, rgba(247, 241, 230, 0.96) 0%, rgba(247, 241, 230, 0.82) 45%, rgba(247, 241, 230, 0.55) 100%);
+}
+[data-theme='light'] .cinema-photo .section-title,
+[data-theme='light'] .cinema-photo h1,
+[data-theme='light'] .cinema-photo h2,
+[data-theme='light'] .cinema-photo h3 {
+  color: #241a10;
+}
+[data-theme='light'] .cinema-photo .eyebrow,
+[data-theme='light'] .cinema-photo .nav__logo-dot {
+  color: #e8620c;
+}
+[data-theme='light'] .cinema-photo > .container > p,
+[data-theme='light'] .cinema-photo .section-head p,
+[data-theme='light'] .cinema-photo p {
+  color: #3d2e1e;
+}
+[data-theme='light'] .cinema-photo .card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(232, 98, 12, 0.18);
+}
+[data-theme='light'] .cinema-photo .card h2,
+[data-theme='light'] .cinema-photo .card h3,
+[data-theme='light'] .cinema-photo .card h4,
+[data-theme='light'] .cinema-photo .card strong {
+  color: #241a10;
+}
+[data-theme='light'] .cinema-photo .card p,
+[data-theme='light'] .cinema-photo .card li {
+  color: #4a3a28;
+}
+[data-theme='light'] .cinema-photo .card .nav__logo-dot,
+[data-theme='light'] .cinema-photo .card span.nav__logo-dot {
+  color: #e8620c;
+}
+[data-theme='light'] .cinema-photo .field input,
+[data-theme='light'] .cinema-photo .field textarea,
+[data-theme='light'] .cinema-photo .field select {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.18);
+  color: #241a10;
+}
+[data-theme='light'] .cinema-photo .field label {
+  color: #4a3a28;
+}
+[data-theme='light'] .cinema-photo .btn--ghost,
+[data-theme='light'] .cinema-photo .btn--surface {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.22);
+  color: #3d2e1e;
+}
+
+/* ---------- Page hero (Movies) ---------- */
+[data-theme='light'] .page-hero--dark {
+  background:
+    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.12), transparent 60%),
+    linear-gradient(180deg, #f6ecd9 0%, #efe2c8 100%);
+  color: #241a10;
+}
+[data-theme='light'] .page-hero--dark .section-title,
+[data-theme='light'] .page-hero--dark h1,
+[data-theme='light'] .page-hero--dark h2 {
+  color: #241a10;
+}
+[data-theme='light'] .page-hero--dark .eyebrow {
+  color: #e8620c;
+}
+[data-theme='light'] .page-hero--dark .hero-label {
+  color: #6b563c;
+}
+[data-theme='light'] .page-hero--dark .field label {
+  color: #4a3a28;
+}
+[data-theme='light'] .page-hero--dark .field input {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.2);
+  color: #241a10;
+}
+/* ---------- Cinema cards + date pills (Movies) ---------- */
+[data-theme='light'] .cinema-card-select {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(43, 31, 21, 0.16);
+  color: #241a10;
+  box-shadow: 0 6px 20px -10px rgba(43, 31, 21, 0.12);
+}
+[data-theme='light'] .cinema-card-select:hover {
+  border-color: #e8620c;
+  background: rgba(255, 255, 255, 0.95);
+}
+[data-theme='light'] .cinema-card-select.is-selected {
+  border-color: #e8620c;
+  background: linear-gradient(135deg, rgba(255, 138, 61, 0.14), rgba(232, 98, 12, 0.06));
+  box-shadow: 0 0 0 3px rgba(232, 98, 12, 0.16), 0 12px 32px -12px rgba(232, 98, 12, 0.25);
+}
+[data-theme='light'] .cinema-card-select__name {
+  color: #241a10;
+}
+[data-theme='light'] .cinema-card-select__addr {
+  color: #6b563c;
+}
+[data-theme='light'] .date-pill {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.2);
+  color: #4a3a28;
+}
+[data-theme='light'] .date-pill:hover {
+  border-color: #e8620c;
+  color: #e8620c;
+}
+[data-theme='light'] .date-pill.is-selected {
+  background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #c24a00 100%);
+  color: #fff;
+  border-color: transparent;
+}
+[data-theme='light'] .page-hero--dark .showtime-chip {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.2);
+  color: #4a3a28;
+}
+[data-theme='light'] .page-hero--dark .showtime-chip:hover {
+  border-color: #e8620c;
+  background: rgba(232, 98, 12, 0.08);
+  color: #e8620c;
+}
+[data-theme='light'] .page-hero--dark .showtime-chip.is-selected {
+  background: linear-gradient(135deg, #ff8a3d 0%, #e8620c 55%, #c24a00 100%);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ---------- Movie detail ---------- */
+[data-theme='light'] .detail-hero--full {
+  background: linear-gradient(180deg, #f6ecd9 0%, #faf5ec 100%);
+  color: #241a10;
+}
+[data-theme='light'] .detail-hero--full .detail-crumb,
+[data-theme='light'] .detail-hero--full .detail-crumb a {
+  color: #6b563c;
+}
+[data-theme='light'] .detail-hero--full .detail-crumb a:hover {
+  color: #241a10;
+}
+[data-theme='light'] .detail-hero--full .detail-crumb span:last-child {
+  color: #e8620c;
+}
+[data-theme='light'] .detail-hero--full .detail-info__title {
+  color: #241a10;
+}
+[data-theme='light'] .detail-hero--full .detail-info__meta,
+[data-theme='light'] .detail-hero--full .detail-info__desc,
+[data-theme='light'] .detail-hero--full .detail-info__meta-item dd,
+[data-theme='light'] .detail-hero--full .detail-info__meta-item dt {
+  color: #4a3a28;
+}
+[data-theme='light'] .detail-hero--full .btn--ghost {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.22);
+  color: #3d2e1e;
+}
+[data-theme='light'] .detail-track,
+[data-theme='light'] .detail-trailer {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.14);
+}
+
+/* ---------- Movie rows / cards list ---------- */
+[data-theme='light'] .movie-row {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.12);
+}
+[data-theme='light'] .movie-row__title,
+[data-theme='light'] .movie-card__title {
+  color: #241a10;
+}
+[data-theme='light'] .movie-row__meta,
+[data-theme='light'] .movie-card__meta,
+[data-theme='light'] .movie-card__desc {
+  color: #4a3a28;
+}
+[data-theme='light'] .movie-row__showtimes .showtime-chip,
+[data-theme='light'] .movie-row__times .showtime-chip {
+  background: #fbf5ea;
+  border-color: rgba(232, 98, 12, 0.25);
+  color: #b35000;
+}
+
+/* ---------- Forms global ---------- */
+[data-theme='light'] .field input,
+[data-theme='light'] .field textarea,
+[data-theme='light'] .field select {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.18);
+  color: #241a10;
+}
+[data-theme='light'] .field input::placeholder,
+[data-theme='light'] .field textarea::placeholder {
+  color: #8a7660;
+}
+[data-theme='light'] .field label {
+  color: #4a3a28;
+}
+[data-theme='light'] .alert {
+  color: #241a10;
+}
+[data-theme='light'] .alert--success {
+  background: rgba(46, 158, 91, 0.12);
+  border-color: rgba(46, 158, 91, 0.3);
+}
+[data-theme='light'] .alert--error {
+  background: rgba(216, 67, 63, 0.12);
+  border-color: rgba(216, 67, 63, 0.3);
+}
+
+/* ---------- Cards global ---------- */
+[data-theme='light'] .card {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.12);
+  box-shadow: 0 10px 30px -14px rgba(43, 31, 21, 0.15);
+}
+[data-theme='light'] .card h1,
+[data-theme='light'] .card h2,
+[data-theme='light'] .card h3,
+[data-theme='light'] .card h4 {
+  color: #241a10;
+}
+[data-theme='light'] .card p,
+[data-theme='light'] .card li {
+  color: #4a3a28;
+}
+
+/* ---------- Admin panel ---------- */
+[data-theme='light'] .admin-sidebar {
+  background: #fff;
+}
+[data-theme='light'] .admin-table th {
+  background: #f6efdf;
+  color: #4a3a28;
+}
+[data-theme='light'] .admin-table td {
+  color: #3d2e1e;
+  border-color: rgba(43, 31, 21, 0.1);
+}
+
+/* ---------- Footer ---------- */
+[data-theme='light'] footer {
+  color: #4a3a28;
+}
+[data-theme='light'] footer h4 {
+  color: #241a10;
+}
+[data-theme='light'] footer a:hover {
+  color: #e8620c;
+}
+
+/* ---------- Navbar stays orange in light (brand) ---------- */
+[data-theme='light'] .nav {
+  background: linear-gradient(90deg, #c45500 0%, #ff8a3d 48%, #e8620c 100%);
+}
+[data-theme='light'] .nav__logo,
+[data-theme='light'] .nav__logo-dot,
+[data-theme='light'] .nav__link,
+[data-theme='light'] .nav__burger,
+[data-theme='light'] .nav .btn--ghost {
+  color: #fff;
+}
+
+/* ---------- Badges ---------- */
+[data-theme='light'] .badge:not(.badge--gold):not(.badge--green):not(.badge--red) {
+  background: #fff;
+  border-color: rgba(43, 31, 21, 0.18);
+  color: #3d2e1e;
+}

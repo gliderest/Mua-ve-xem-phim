@@ -6,6 +6,7 @@ import '@/styles/base.css'
 import '@/styles/components.css'
 import '@/styles/animations.css'
 import '@/styles/responsive.css'
+import '@/styles/light.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
