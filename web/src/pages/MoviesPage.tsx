@@ -61,11 +61,17 @@ export function MoviesPage() {
     return map
   }, [cinemaShowtimes])
 
-  const filtered = movies.filter((m) => {
+  const filtered = movies
+  .filter((m) => {
     const okFilter = filter === 'ALL' || m.status === filter
     const q = query.trim().toLowerCase()
     const okQuery = !q || m.title.toLowerCase().includes(q) || m.genre.some((g) => g.toLowerCase().includes(q))
     return okFilter && okQuery
+  })
+  .sort((a, b) => {
+    // Đang chiếu luôn trên, Sắp chiếu dưới; trong cùng nhóm theo rating giảm dần
+    if (a.status !== b.status) return a.status === 'NOW_SHOWING' ? -1 : 1
+    return (b.rating ?? 0) - (a.rating ?? 0)
   })
 
   const dates = Array.from({ length: 7 }, (_, i) => {

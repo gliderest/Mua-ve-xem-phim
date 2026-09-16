@@ -78,17 +78,69 @@ catalogRouter.get('/movies/:id', async (req: Request, res, next) => {
   } catch (e) { next(e) }
 })
 
-/* ---------------- Showtimes của phim ---------------- */
+/* ---------------- Showtimes của phim --------------------
+   Trả suất thật trong DB, đồng thời bổ sung suất mặc định cho phim
+   ĐANG CHIẾU ở mọi rạp (đồng bộ với tab Phim). Suất mặc định có id
+   dạng `syn-...` do frontend tự chuyển hướng phù hợp.
+   -------------------------------------------------------- */
 catalogRouter.get('/movies/:id/showtimes', async (req: Request, res, next) => {
   try {
-    const { data, error } = await supabaseAdmin
+    const movieId = req.params.id
+    const movieRes = await supabaseAdmin.from('movies').select('status, duration_minutes').eq('id', movieId).maybeSingle()
+    if (movieRes.error) throw movieRes.error
+
+    const { data: real, error: stErr } = await supabaseAdmin
       .from('showtimes')
       .select('*, cinema:cinemas(name, district), room:rooms(name)')
-      .eq('movie_id', req.params.id)
+      .eq('movie_id', movieId)
       .gte('start_time', new Date().toISOString())
       .order('start_time', { ascending: true })
-    if (error) throw error
-    ok(res, data ?? [])
+    if (stErr) throw stErr
+
+    const status = (movieRes.data as { status?: string } | null)?.status
+    if (status !== 'NOW_SHOWING') {
+      ok(res, real ?? [])
+      return
+    }
+
+    // Phim đang chiếu → bổ sung suất mặc định cho rạp chưa có suất thật
+    const { data: cinemas, error: cErr } = await supabaseAdmin.from('cinemas').select('id, name, district')
+    if (cErr) throw cErr
+
+    const { data: rooms } = await supabaseAdmin.from('rooms').select('id, cinema_id').order('created_at')
+
+    const moviesWithReal = new Set<string>()
+    for (const s of real ?? []) moviesWithReal.add((s as { cinema_id: string }).cinema_id)
+
+    const DEFAULT_TIMES = ['10:00', '13:30', '17:00', '20:30']
+    const synthetic: any[] = []
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(Date.now() + d * 86400000).toISOString().slice(0, 10)
+      for (const c of cinemas ?? []) {
+        if (moviesWithReal.has(c.id)) continue
+        const room = (rooms ?? []).find((r: { cinema_id: string }) => r.cinema_id === c.id)
+        for (const t of DEFAULT_TIMES) {
+          synthetic.push({
+            id: `syn-${c.id}-${movieId}-${date}-${t}`,
+            movie_id: movieId,
+            cinema_id: c.id,
+            room_id: room?.id ?? null,
+            date,
+            start_time: `${date}T${t}:00`,
+            end_time: `${date}T${t}:00`,
+            price_standard: 90000,
+            price_vip: 120000,
+            cinema: { name: c.name, district: c.district ?? '' },
+            room: { name: room ? `Phòng ${(room as { id: string }).id.slice(0, 4)}` : null },
+          })
+        }
+      }
+    }
+
+    const all = [...(real ?? []), ...synthetic].sort((a: any, b: any) =>
+      (a.start_time ?? '').localeCompare(b.start_time ?? ''),
+    )
+    ok(res, all)
   } catch (e) { next(e) }
 })
 

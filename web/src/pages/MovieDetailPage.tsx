@@ -276,7 +276,17 @@ function SectionShowtimes({ groupedByCinema, dates, cinemas, selectedDate, onDat
                       .sort((a, b) => a.startTime.localeCompare(b.startTime))
                       .map((st) => {
                         const time = new Date(st.startTime)
-                        return (
+                        const isDemo = String(st.id).startsWith('syn-')
+                        return isDemo ? (
+                          <span
+                            key={st.id}
+                            className="showtime-chip showtime-chip--demo"
+                            title="Suất chiếu mẫu — sẽ chính thức khi quản trị viên xác nhận."
+                          >
+                            {time.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                            <small>{formatVND(st.priceStandard)}</small>
+                          </span>
+                        ) : (
                           <Link key={st.id} to={`/booking/${st.id}`} className="showtime-chip">
                             {time.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                             <small>{formatVND(st.priceStandard)}</small>
