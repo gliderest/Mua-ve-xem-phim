@@ -26,13 +26,7 @@ export function ContactPage() {
   }
 
   return (
-    <section
-      className="section section--page cinema-photo"
-      style={{
-        backgroundImage:
-          'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80)',
-      }}
-    >
+    <section className="section section--page cinema-photo cinema-photo--plain">
       <div className="container" style={{ maxWidth: 960 }}>
         <span className="eyebrow">Liên hệ</span>
         <h1 className="section-title" style={{ marginTop: 'var(--space-3)' }}>

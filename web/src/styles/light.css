@@ -185,6 +185,25 @@
 [data-theme='light'] .movie-card__desc {
   color: #4a3a28;
 }
+
+/* ---------- Movie titles — nổi, gradient cam (light) ---------- */
+[data-theme='light'] .movie-card__title a,
+[data-theme='light'] .movie-row__title a,
+[data-theme='light'] .movie-row__title,
+[data-theme='light'] .detail-info__title,
+[data-theme='light'] .hero--slide .hero__title {
+  color: transparent;
+  background: linear-gradient(135deg, #e8620c 0%, #a33a00 60%, #7a2b00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+[data-theme='light'] .movie-card__genre,
+[data-theme='light'] .movie-card__meta,
+[data-theme='light'] .movie-row__meta {
+  color: #8a5a28;
+  font-weight: 600;
+}
 [data-theme='light'] .movie-row__showtimes .showtime-chip,
 [data-theme='light'] .movie-row__times .showtime-chip {
   background: #fbf5ea;

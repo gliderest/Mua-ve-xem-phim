@@ -2131,3 +2131,26 @@
 .cinema-strip {
   border-block: 1px solid var(--border);
 }
+/* Cinema photo không ảnh — dùng gradient CSS thay unsplash */
+.cinema-photo--plain {
+  background:
+    radial-gradient(ellipse 70% 80% at 80% 10%, rgba(232, 98, 12, 0.16), transparent 55%),
+    radial-gradient(ellipse 60% 70% at 10% 90%, rgba(255, 138, 61, 0.1), transparent 50%),
+    linear-gradient(160deg, #2a2022 0%, #1b1418 55%, #120d10 100%);
+}
+[data-theme='light'] .cinema-photo--plain {
+  background:
+    radial-gradient(ellipse 70% 80% at 80% 10%, rgba(232, 98, 12, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 70% at 10% 90%, rgba(255, 138, 61, 0.08), transparent 50%),
+    linear-gradient(160deg, #f6ecd9 0%, #efe2c8 55%, #e9dbc0 100%);
+}
+.cinema-photo--strip {
+  background:
+    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.18), transparent 60%),
+    linear-gradient(180deg, #231a19 0%, #140e10 100%);
+}
+[data-theme='light'] .cinema-photo--strip {
+  background:
+    radial-gradient(ellipse 60% 90% at 50% -20%, rgba(232, 98, 12, 0.12), transparent 60%),
+    linear-gradient(180deg, #f6ecd9 0%, #f0e4cc 100%);
+}
