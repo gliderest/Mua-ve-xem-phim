@@ -26,11 +26,17 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        value: https://cinega.onrender.com
+        value: https://mua-ve-xem-phim.onrender.com
+      # TMDB - Backend cần key này để sync phim từ TMDB vào Supabase
       - key: TMDB_API_KEY
         sync: false
+      # TMDB - Frontend (Vite) cần các biến này để gọi TMDB client-side
       - key: VITE_TMDB_API_KEY
         value: 13a6c132b1b02cf2a8c2a66d939c6928
+      - key: VITE_TMDB_ACCESS_TOKEN
+        sync: false
+      - key: VITE_TMDB_IMAGE_BASE
+        value: https://image.tmdb.org/t/p
       - key: SEPAY_API_KEY
         sync: false
       - key: SEPAY_WEBHOOK_SECRET

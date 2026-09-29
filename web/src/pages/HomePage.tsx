@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { movieService } from '@/services/api'
+import { tmdbService } from '@/services/tmdb'
 import { MovieCard } from '@/components/common/MovieCard'
 import { AdPopup } from '@/components/AdPopup'
 import { PosterArt } from '@/components/svg/PosterArt'
@@ -15,10 +16,56 @@ export function HomePage() {
   useReveal(listRef, [movies, loading])
 
   useEffect(() => {
-    movieService
-      .list()
-      .then((m) => setMovies(m.filter((x) => x.status !== 'ENDED')))
-      .finally(() => setLoading(false))
+    let isMounted = true
+
+    const fetchMovies = async () => {
+      try {
+        setLoading(true)
+        // Try backend first
+        const backendMovies = await movieService.list()
+
+        if (backendMovies && backendMovies.length > 0) {
+          // Use backend data if available
+          if (isMounted) setMovies(backendMovies.filter((x) => x.status !== 'ENDED'))
+        } else if (tmdbService.enabled) {
+          // Fallback to TMDB client-side if backend returns empty and TMDB is enabled
+          console.info('[HomePage] Backend returned empty movies, trying TMDB client-side')
+          const nowPlaying = await tmdbService.nowPlayingVN(12)
+          const upcoming = await tmdbService.upcomingVN(8)
+
+          // Combine and format as Movie objects (tmdbService already returns Movie format)
+          const allMovies = [...nowPlaying, ...upcoming]
+          if (isMounted) setMovies(allMovies)
+        } else {
+          // No data from either source
+          if (isMounted) setMovies([])
+        }
+      } catch (error) {
+        console.error('[HomePage] Error fetching movies:', error)
+        // If backend fails but TMDB is available, try TMDB as fallback
+        if (tmdbService.enabled) {
+          try {
+            const nowPlaying = await tmdbService.nowPlayingVN(12)
+            const upcoming = await tmdbService.upcomingVN(8)
+            const allMovies = [...nowPlaying, ...upcoming]
+            if (isMounted) setMovies(allMovies)
+          } catch (tmdbError) {
+            console.error('[HomePage] TMDB fallback also failed:', tmdbError)
+            if (isMounted) setMovies([])
+          }
+        } else {
+          if (isMounted) setMovies([])
+        }
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    fetchMovies()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const nowShowing = movies.filter((m) => m.status === 'NOW_SHOWING')
