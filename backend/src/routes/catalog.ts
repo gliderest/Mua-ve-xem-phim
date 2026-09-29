@@ -57,6 +57,7 @@ async function syncTmdIfEmpty() {
 /* ---------------- Movies ---------------- */
 catalogRouter.get('/movies', async (req: Request, res, next) => {
   try {
+    // Sync TMDB nếu bảng rỗng (non-blocking, không làm chậm response)
     void syncTmdIfEmpty()
     const status = req.query.status as string | undefined
     let query = supabaseAdmin.from('movies').select('*').order('release_date', { ascending: false })
@@ -64,9 +65,19 @@ catalogRouter.get('/movies', async (req: Request, res, next) => {
       query = query.eq('status', status)
     }
     const { data, error } = await query
-    if (error) throw error
-    ok(res, data)
-  } catch (e) { next(e) }
+    if (error) {
+      // Log lỗi Supabase chi tiết để debug
+      console.error('[catalog] Supabase error fetching movies:', error)
+      // Trả về mảng rỗng thay vì 500 để frontend không bị crash
+      ok(res, [])
+      return
+    }
+    ok(res, data ?? [])
+  } catch (e) {
+    console.error('[catalog] Unexpected error fetching movies:', e)
+    // Trả về mảng rỗng thay vì 500
+    ok(res, [])
+  }
 })
 
 catalogRouter.get('/movies/:id', async (req: Request, res, next) => {
